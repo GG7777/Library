@@ -16,11 +16,9 @@ import java.util.Optional;
 @Service
 public class AuthorServiceImpl implements AuthorService {
     private final AuthorRepository authorRepo;
-    private final NumberNormalizer normalizer;
 
-    public AuthorServiceImpl(AuthorRepository authorRepo, NumberNormalizer normalizer) {
+    public AuthorServiceImpl(AuthorRepository authorRepo) {
         this.authorRepo = authorRepo;
-        this.normalizer = normalizer;
     }
 
     @Override
@@ -28,8 +26,8 @@ public class AuthorServiceImpl implements AuthorService {
         List<Author> authors = authorRepo.findAll();
 
         return authors.subList(
-                normalizer.normalize(begin, 0, authors.size() - 1),
-                normalizer.normalize(begin + count - 1, 0, authors.size() - 1));
+                NumberNormalizer.normalize(begin, 0, authors.size() - 1),
+                NumberNormalizer.normalize(begin + count - 1, 0, authors.size() - 1));
     }
 
     @Override

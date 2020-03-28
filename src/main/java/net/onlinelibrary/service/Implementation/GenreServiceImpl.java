@@ -16,19 +16,17 @@ import java.util.Optional;
 @Service
 public class GenreServiceImpl implements GenreService {
     private final GenreRepository genreRepo;
-    private final NumberNormalizer normalizer;
 
-    public GenreServiceImpl(GenreRepository genreRepo, NumberNormalizer normalizer) {
+    public GenreServiceImpl(GenreRepository genreRepo) {
         this.genreRepo = genreRepo;
-        this.normalizer = normalizer;
     }
 
     @Override
     public List<Genre> getByRange(Integer begin, Integer count) {
         List<Genre> genres = genreRepo.findAll();
         return genres.subList(
-                normalizer.normalize(begin, 0, genres.size() - 1),
-                normalizer.normalize(begin + count - 1, 0, genres.size() - 1)
+                NumberNormalizer.normalize(begin, 0, genres.size() - 1),
+                NumberNormalizer.normalize(begin + count - 1, 0, genres.size() - 1)
         );
     }
 

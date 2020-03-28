@@ -18,19 +18,17 @@ import java.util.Set;
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepo;
-    private final NumberNormalizer normalizer;
 
-    public UserServiceImpl(UserRepository userRepo, NumberNormalizer normalizer) {
+    public UserServiceImpl(UserRepository userRepo) {
         this.userRepo = userRepo;
-        this.normalizer = normalizer;
     }
 
     @Override
     public List<User> getByRange(Integer begin, Integer count) {
         List<User> users = userRepo.findAll();
         return users.subList(
-                normalizer.normalize(begin, 0, users.size() - 1),
-                normalizer.normalize(begin + count - 1, 0, users.size() - 1)
+                NumberNormalizer.normalize(begin, 0, users.size() - 1),
+                NumberNormalizer.normalize(begin + count - 1, 0, users.size() - 1)
         );
     }
 

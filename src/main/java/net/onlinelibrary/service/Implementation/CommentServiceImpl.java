@@ -1,6 +1,5 @@
 package net.onlinelibrary.service.Implementation;
 
-import net.onlinelibrary.exception.BookException;
 import net.onlinelibrary.exception.CommentException;
 import net.onlinelibrary.model.Book;
 import net.onlinelibrary.model.Comment;
@@ -17,19 +16,17 @@ import java.util.Optional;
 @Service
 public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepo;
-    private final NumberNormalizer normalizer;
 
-    public CommentServiceImpl(CommentRepository commentRepo, NumberNormalizer normalizer) {
+    public CommentServiceImpl(CommentRepository commentRepo) {
         this.commentRepo = commentRepo;
-        this.normalizer = normalizer;
     }
 
     @Override
     public List<Comment> getByRange(Integer begin, Integer count) {
         List<Comment> comments = commentRepo.findAll();
         return comments.subList(
-                normalizer.normalize(begin, 0, comments.size() - 1),
-                normalizer.normalize(begin + count - 1, 0, comments.size() - 1));
+                NumberNormalizer.normalize(begin, 0, comments.size() - 1),
+                NumberNormalizer.normalize(begin + count - 1, 0, comments.size() - 1));
     }
 
     @Override
