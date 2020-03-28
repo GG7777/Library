@@ -7,6 +7,7 @@ import net.onlinelibrary.model.Role;
 import net.onlinelibrary.model.User;
 
 import java.util.List;
+import java.util.Set;
 
 public interface UserService {
     List<User> getByRange(Integer begin, Integer count);
@@ -15,9 +16,9 @@ public interface UserService {
 
     List<Comment> getCommentsOfUser(Long userId) throws UserNotFoundException;
 
-    List<Role> getRolesOfUser(Long userId) throws UserNotFoundException;
+    Set<Role> getRolesOfUser(Long userId) throws UserNotFoundException;
 
     User saveUser(User user) throws UserAlreadyExistsException;
 
-    User deleteById(Long userId) throws UserNotFoundException;
+    void deleteById(Long userId) throws UserNotFoundException;
 }

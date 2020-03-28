@@ -14,7 +14,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 @RestController
@@ -60,7 +60,7 @@ public class UserController {
     }
 
     @GetMapping("{id}/roles")
-    public List<Role> getRolesOfUser(@PathVariable("id") Long userId) {
+    public Set<Role> getRolesOfUser(@PathVariable("id") Long userId) {
         try {
             return userService.getRolesOfUser(userId);
         } catch (UserNotFoundException e) {
@@ -139,9 +139,9 @@ public class UserController {
 
 
     @DeleteMapping("{id}")
-    public UserDto deleteUser(@PathVariable("id") Long userId) {
+    public void deleteUser(@PathVariable("id") Long userId) {
         try {
-            return userMapper.toDto(userService.deleteById(userId));
+            userService.deleteById(userId);
         } catch (UserNotFoundException e) {
             throw new NotFoundException(e.getMessage());
         }

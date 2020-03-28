@@ -18,5 +18,5 @@ public interface GenreService {
 
     Genre saveGenre(Genre genre);
 
-    Genre deleteById(Long genreId) throws GenreException;
+    void deleteById(Long genreId) throws GenreException;
 }

@@ -129,9 +129,9 @@ public class GenreController {
 
 
     @DeleteMapping("{id}")
-    public GenreDto deleteGenre(@PathVariable("id") Long genreId) {
+    public void deleteGenre(@PathVariable("id") Long genreId) {
         try {
-            return genreMapper.toDto(genreService.deleteById(genreId));
+            genreService.deleteById(genreId);
         } catch (GenreException e) {
             throw new NotFoundException(e.getMessage());
         }
