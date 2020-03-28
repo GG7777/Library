@@ -7,6 +7,7 @@ import net.onlinelibrary.model.Comment;
 import net.onlinelibrary.model.Genre;
 import net.onlinelibrary.repository.BookRepository;
 import net.onlinelibrary.service.BookService;
+import net.onlinelibrary.util.NumberNormalizer;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
@@ -16,9 +17,11 @@ import java.util.Optional;
 @Service
 public class BookServiceImpl implements BookService {
     private final BookRepository bookRepo;
+    private final NumberNormalizer normalizer;
 
-    public BookServiceImpl(BookRepository bookRepo) {
+    public BookServiceImpl(BookRepository bookRepo, NumberNormalizer normalizer) {
         this.bookRepo = bookRepo;
+        this.normalizer = normalizer;
     }
 
     @Override
@@ -26,8 +29,8 @@ public class BookServiceImpl implements BookService {
         List<Book> books = bookRepo.findAll();
 
         return books.subList(
-                normalizeNumber(begin, 0, books.size() - 1),
-                normalizeNumber(begin + count - 1, 0, books.size() - 1));
+                normalizer.normalize(begin, 0, books.size() - 1),
+                normalizer.normalize(begin + count - 1, 0, books.size() - 1));
     }
 
     @Override
@@ -74,13 +77,5 @@ public class BookServiceImpl implements BookService {
         } catch (EmptyResultDataAccessException e) {
             throw new BookException("Book with id \'" + bookId + "\' has not found");
         }
-    }
-
-    private Integer normalizeNumber(Integer number, Integer minValue, Integer maxValue) {
-        return number < minValue
-                ? minValue
-                : number > maxValue
-                ? maxValue
-                : number;
     }
 }

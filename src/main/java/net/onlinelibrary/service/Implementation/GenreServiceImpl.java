@@ -6,6 +6,7 @@ import net.onlinelibrary.model.Book;
 import net.onlinelibrary.model.Genre;
 import net.onlinelibrary.repository.GenreRepository;
 import net.onlinelibrary.service.GenreService;
+import net.onlinelibrary.util.NumberNormalizer;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
@@ -15,17 +16,19 @@ import java.util.Optional;
 @Service
 public class GenreServiceImpl implements GenreService {
     private final GenreRepository genreRepo;
+    private final NumberNormalizer normalizer;
 
-    public GenreServiceImpl(GenreRepository genreRepo) {
+    public GenreServiceImpl(GenreRepository genreRepo, NumberNormalizer normalizer) {
         this.genreRepo = genreRepo;
+        this.normalizer = normalizer;
     }
 
     @Override
     public List<Genre> getByRange(Integer begin, Integer count) {
         List<Genre> genres = genreRepo.findAll();
         return genres.subList(
-                normalizeNumber(begin, 0, genres.size() - 1),
-                normalizeNumber(begin + count - 1, 0, genres.size() - 1)
+                normalizer.normalize(begin, 0, genres.size() - 1),
+                normalizer.normalize(begin + count - 1, 0, genres.size() - 1)
         );
     }
 
@@ -67,13 +70,5 @@ public class GenreServiceImpl implements GenreService {
         {
             throw new GenreException("Genre with id \'" + genreId + "\' has not found");
         }
-    }
-
-    private Integer normalizeNumber(Integer number, Integer minValue, Integer maxValue) {
-        return number < minValue
-                ? minValue
-                : number > maxValue
-                    ? maxValue
-                    : number;
     }
 }

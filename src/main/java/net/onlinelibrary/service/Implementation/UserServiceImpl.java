@@ -1,18 +1,16 @@
 package net.onlinelibrary.service.Implementation;
 
-import net.onlinelibrary.exception.GenreException;
 import net.onlinelibrary.exception.UserAlreadyExistsException;
 import net.onlinelibrary.exception.UserNotFoundException;
 import net.onlinelibrary.model.Comment;
-import net.onlinelibrary.model.Genre;
 import net.onlinelibrary.model.Role;
 import net.onlinelibrary.model.User;
 import net.onlinelibrary.repository.UserRepository;
 import net.onlinelibrary.service.UserService;
+import net.onlinelibrary.util.NumberNormalizer;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -20,17 +18,19 @@ import java.util.Set;
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepo;
+    private final NumberNormalizer normalizer;
 
-    public UserServiceImpl(UserRepository userRepo) {
+    public UserServiceImpl(UserRepository userRepo, NumberNormalizer normalizer) {
         this.userRepo = userRepo;
+        this.normalizer = normalizer;
     }
 
     @Override
     public List<User> getByRange(Integer begin, Integer count) {
         List<User> users = userRepo.findAll();
         return users.subList(
-                normalizeNumber(begin, 0, users.size() - 1),
-                normalizeNumber(begin + count - 1, 0, users.size() - 1)
+                normalizer.normalize(begin, 0, users.size() - 1),
+                normalizer.normalize(begin + count - 1, 0, users.size() - 1)
         );
     }
 
@@ -78,13 +78,5 @@ public class UserServiceImpl implements UserService {
         {
             throw new UserNotFoundException("User with id \'" + userId + "\' has not found");
         }
-    }
-
-    private Integer normalizeNumber(Integer number, Integer minValue, Integer maxValue) {
-        return number < minValue
-                ? minValue
-                : number > maxValue
-                ? maxValue
-                : number;
     }
 }
