@@ -1,43 +1,72 @@
 package net.onlinelibrary.service.Implementation;
 
+import net.onlinelibrary.exception.BookException;
 import net.onlinelibrary.exception.CommentException;
 import net.onlinelibrary.model.Book;
 import net.onlinelibrary.model.Comment;
 import net.onlinelibrary.model.User;
+import net.onlinelibrary.repository.CommentRepository;
 import net.onlinelibrary.service.CommentService;
+import net.onlinelibrary.util.NumberNormalizer;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CommentServiceImpl implements CommentService {
+    private final CommentRepository commentRepo;
+    private final NumberNormalizer normalizer;
+
+    public CommentServiceImpl(CommentRepository commentRepo, NumberNormalizer normalizer) {
+        this.commentRepo = commentRepo;
+        this.normalizer = normalizer;
+    }
+
     @Override
     public List<Comment> getByRange(Integer begin, Integer count) {
-        return null;
+        List<Comment> comments = commentRepo.findAll();
+        return comments.subList(
+                normalizer.normalize(begin, 0, comments.size() - 1),
+                normalizer.normalize(begin + count - 1, 0, comments.size() - 1));
     }
 
     @Override
     public Comment getById(Long commentId) throws CommentException {
-        return null;
+        Optional<Comment> commentOpt = commentRepo.findById(commentId);
+        if(!commentOpt.isPresent())
+            throw new CommentException("Comment with id \'" + commentId + "\' has not found");
+        return commentOpt.get();
     }
 
     @Override
     public Book getBookOfComment(Long commentId) throws CommentException {
-        return null;
+        Optional<Comment> commentOpt = commentRepo.findById(commentId);
+        if(!commentOpt.isPresent())
+            throw new CommentException("Comment with id \'" + commentId + "\' has not found");
+        return commentOpt.get().getBook();
     }
 
     @Override
     public User getUserOfComment(Long commentId) throws CommentException {
-        return null;
+        Optional<Comment> commentOpt = commentRepo.findById(commentId);
+        if(!commentOpt.isPresent())
+            throw new CommentException("Comment with id \'" + commentId + "\' has not found");
+        return commentOpt.get().getUser();
     }
 
     @Override
     public Comment saveComment(Comment comment) {
-        return null;
+        return commentRepo.save(comment);
     }
 
     @Override
-    public Comment deleteById(Long authorId) throws CommentException {
-        return null;
+    public void deleteById(Long commentId) throws CommentException {
+        try {
+            commentRepo.deleteById(commentId);
+        } catch (EmptyResultDataAccessException e) {
+            throw new CommentException("Comment with id \'" + commentId + "\' has not found");
+        }
     }
 }

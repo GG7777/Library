@@ -18,5 +18,5 @@ public interface CommentService {
 
     Comment saveComment(Comment comment);
 
-    Comment deleteById(Long authorId) throws CommentException;
+    void deleteById(Long commentId) throws CommentException;
 }

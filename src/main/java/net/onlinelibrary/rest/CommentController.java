@@ -123,9 +123,9 @@ public class CommentController {
 
 
     @DeleteMapping("{id}")
-    public CommentDto deleteComment(@PathVariable("id") Long commentId) {
+    public void deleteComment(@PathVariable("id") Long commentId) {
         try {
-            return commentMapper.toDto(commentService.deleteById(commentId));
+            commentService.deleteById(commentId);
         } catch (CommentException e) {
             throw new NotFoundException(e.getMessage());
         }
