@@ -132,9 +132,9 @@ public class AuthorController {
 
 
     @DeleteMapping("{id}")
-    public AuthorDto deleteAuthor(@PathVariable("id") Long authorId) {
+    public void deleteAuthor(@PathVariable("id") Long authorId) {
         try {
-            return authorMapper.toDto(authorService.deleteById(authorId));
+            authorService.deleteById(authorId);
         } catch (AuthorException e) {
             throw new NotFoundException(e.getMessage());
         }
