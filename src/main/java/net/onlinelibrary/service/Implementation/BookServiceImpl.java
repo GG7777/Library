@@ -5,45 +5,82 @@ import net.onlinelibrary.model.Author;
 import net.onlinelibrary.model.Book;
 import net.onlinelibrary.model.Comment;
 import net.onlinelibrary.model.Genre;
+import net.onlinelibrary.repository.BookRepository;
 import net.onlinelibrary.service.BookService;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BookServiceImpl implements BookService {
+    private final BookRepository bookRepo;
+
+    public BookServiceImpl(BookRepository bookRepo) {
+        this.bookRepo = bookRepo;
+    }
+
     @Override
     public List<Book> getByRange(Integer begin, Integer count) {
-        return null;
+        List<Book> books = bookRepo.findAll();
+
+        return books.subList(
+                normalizeNumber(begin, 0, books.size() - 1),
+                normalizeNumber(begin + count - 1, 0, books.size() - 1));
     }
 
     @Override
     public Book getById(Long bookId) throws BookException {
-        return null;
+        Optional<Book> bookOpt = bookRepo.findById(bookId);
+        if (!bookOpt.isPresent())
+            throw new BookException("Book with id \'" + bookId + "\' has not found");
+        return bookOpt.get();
     }
 
     @Override
     public List<Author> getAuthorsOfBook(Long bookId) throws BookException {
-        return null;
+        Optional<Book> bookOpt = bookRepo.findById(bookId);
+        if (!bookOpt.isPresent())
+            throw new BookException("Book with id \'" + bookId + "\' has not found");
+        return bookOpt.get().getAuthors();
     }
 
     @Override
     public List<Genre> getGenresOfBook(Long bookId) throws BookException {
-        return null;
+        Optional<Book> bookOpt = bookRepo.findById(bookId);
+        if (!bookOpt.isPresent())
+            throw new BookException("Book with id \'" + bookId + "\' has not found");
+        return bookOpt.get().getGenres();
     }
 
     @Override
     public List<Comment> getCommentsOfBook(Long bookId) throws BookException {
-        return null;
+        Optional<Book> bookOpt = bookRepo.findById(bookId);
+        if (!bookOpt.isPresent())
+            throw new BookException("Book with id \'" + bookId + "\' has not found");
+        return bookOpt.get().getComments();
     }
 
     @Override
     public Book saveBook(Book book) {
-        return null;
+        return bookRepo.save(book);
     }
 
     @Override
-    public Book deleteById(Long bookId) throws BookException {
-        return null;
+    public void deleteById(Long bookId) throws BookException {
+        try {
+            bookRepo.deleteById(bookId);
+        } catch (EmptyResultDataAccessException e) {
+            throw new BookException("Book with id \'" + bookId + "\' has not found");
+        }
+    }
+
+    private Integer normalizeNumber(Integer number, Integer minValue, Integer maxValue) {
+        return number < minValue
+                ? minValue
+                : number > maxValue
+                ? maxValue
+                : number;
     }
 }

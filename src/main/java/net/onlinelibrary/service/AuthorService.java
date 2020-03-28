@@ -18,5 +18,5 @@ public interface AuthorService {
 
     Author saveAuthor(Author author);
 
-    Author deleteById(Long authorId) throws AuthorException;
+    void deleteById(Long authorId) throws AuthorException;
 }

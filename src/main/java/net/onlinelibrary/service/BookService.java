@@ -22,5 +22,5 @@ public interface BookService {
 
     Book saveBook(Book book);
 
-    Book deleteById(Long bookId) throws BookException;
+    void deleteById(Long bookId) throws BookException;
 }

@@ -158,9 +158,9 @@ public class BookController {
 
 
     @DeleteMapping("{id}")
-    public BookDto deleteBook(@PathVariable("id") Long bookId) {
+    public void deleteBook(@PathVariable("id") Long bookId) {
         try {
-            return bookMapper.toDto(bookService.deleteById(bookId));
+            bookService.deleteById(bookId);
         } catch (BookException e) {
             throw new NotFoundException(e.getMessage());
         }
