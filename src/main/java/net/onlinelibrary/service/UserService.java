@@ -2,6 +2,7 @@ package net.onlinelibrary.service;
 
 import net.onlinelibrary.exception.UserAlreadyExistsException;
 import net.onlinelibrary.exception.UserNotFoundException;
+import net.onlinelibrary.exception.ValidationException;
 import net.onlinelibrary.model.Comment;
 import net.onlinelibrary.model.Role;
 import net.onlinelibrary.model.User;
@@ -18,7 +19,7 @@ public interface UserService {
 
     Set<Role> getRolesOfUser(Long userId) throws UserNotFoundException;
 
-    User saveUser(User user) throws UserAlreadyExistsException;
+    User saveUser(User user) throws UserAlreadyExistsException, ValidationException;
 
     void deleteById(Long userId) throws UserNotFoundException;
 }

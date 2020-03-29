@@ -1,13 +1,15 @@
-package net.onlinelibrary.service.Implementation;
+package net.onlinelibrary.service.implementation;
 
 import net.onlinelibrary.exception.UserAlreadyExistsException;
 import net.onlinelibrary.exception.UserNotFoundException;
+import net.onlinelibrary.exception.ValidationException;
 import net.onlinelibrary.model.Comment;
 import net.onlinelibrary.model.Role;
 import net.onlinelibrary.model.User;
 import net.onlinelibrary.repository.UserRepository;
 import net.onlinelibrary.service.UserService;
 import net.onlinelibrary.util.NumberNormalizer;
+import net.onlinelibrary.validator.Validator;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
@@ -18,9 +20,11 @@ import java.util.Set;
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepo;
+    private final Validator<User> userValidator;
 
-    public UserServiceImpl(UserRepository userRepo) {
+    public UserServiceImpl(UserRepository userRepo, Validator<User> userValidator) {
         this.userRepo = userRepo;
+        this.userValidator = userValidator;
     }
 
     @Override
@@ -57,7 +61,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User saveUser(User user) throws UserAlreadyExistsException {
+    public User saveUser(User user) throws UserAlreadyExistsException, ValidationException {
+        userValidator.validate(user);
         if(user.getId() == null)
         {
             if(userRepo.findByUsernameOrEmail(user.getUsername(), user.getEmail()).isPresent())

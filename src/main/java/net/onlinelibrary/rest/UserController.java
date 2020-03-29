@@ -1,10 +1,7 @@
 package net.onlinelibrary.rest;
 
 import net.onlinelibrary.dto.*;
-import net.onlinelibrary.exception.AlreadyExistsException;
-import net.onlinelibrary.exception.NotFoundException;
-import net.onlinelibrary.exception.UserAlreadyExistsException;
-import net.onlinelibrary.exception.UserNotFoundException;
+import net.onlinelibrary.exception.*;
 import net.onlinelibrary.mapper.CommentMapper;
 import net.onlinelibrary.mapper.UserMapper;
 import net.onlinelibrary.model.Role;
@@ -84,6 +81,8 @@ public class UserController {
             return userMapper.toDto(userService.saveUser(user));
         } catch (UserAlreadyExistsException e) {
             throw new AlreadyExistsException(e.getMessage());
+        } catch (ValidationException e) {
+            throw new BadRequestException(e.getMessage());
         }
     }
 
@@ -106,6 +105,8 @@ public class UserController {
             throw new NotFoundException(e.getMessage());
         } catch (UserAlreadyExistsException e) {
             throw new AlreadyExistsException(e.getMessage());
+        } catch (ValidationException e) {
+            throw new BadRequestException(e.getMessage());
         }
     }
 
@@ -133,6 +134,8 @@ public class UserController {
             throw new NotFoundException(e.getMessage());
         } catch (UserAlreadyExistsException e) {
             throw new AlreadyExistsException(e.getMessage());
+        } catch (ValidationException e) {
+            throw new BadRequestException(e.getMessage());
         }
     }
 

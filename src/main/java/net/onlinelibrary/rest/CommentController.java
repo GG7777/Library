@@ -1,8 +1,10 @@
 package net.onlinelibrary.rest;
 
 import net.onlinelibrary.dto.*;
+import net.onlinelibrary.exception.BadRequestException;
 import net.onlinelibrary.exception.CommentException;
 import net.onlinelibrary.exception.NotFoundException;
+import net.onlinelibrary.exception.ValidationException;
 import net.onlinelibrary.mapper.BookMapper;
 import net.onlinelibrary.mapper.CommentMapper;
 import net.onlinelibrary.mapper.UserMapper;
@@ -76,7 +78,11 @@ public class CommentController {
 
         comment.setRating(0l);
 
-        return commentMapper.toDto(commentService.saveComment(comment));
+        try {
+            return commentMapper.toDto(commentService.saveComment(comment));
+        } catch (ValidationException e) {
+            throw new BadRequestException(e.getMessage());
+        }
     }
 
     @PutMapping("{id}")
@@ -94,6 +100,8 @@ public class CommentController {
             return commentMapper.toDto(commentService.saveComment(comment));
         } catch (CommentException e) {
             throw new NotFoundException(e.getMessage());
+        } catch (ValidationException e) {
+            throw new BadRequestException(e.getMessage());
         }
     }
 
@@ -117,6 +125,8 @@ public class CommentController {
             return commentMapper.toDto(commentService.saveComment(comment));
         } catch (CommentException e) {
             throw new NotFoundException(e.getMessage());
+        } catch (ValidationException e) {
+            throw new BadRequestException(e.getMessage());
         }
     }
 

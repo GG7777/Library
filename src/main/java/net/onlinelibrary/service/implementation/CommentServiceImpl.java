@@ -1,12 +1,14 @@
-package net.onlinelibrary.service.Implementation;
+package net.onlinelibrary.service.implementation;
 
 import net.onlinelibrary.exception.CommentException;
+import net.onlinelibrary.exception.ValidationException;
 import net.onlinelibrary.model.Book;
 import net.onlinelibrary.model.Comment;
 import net.onlinelibrary.model.User;
 import net.onlinelibrary.repository.CommentRepository;
 import net.onlinelibrary.service.CommentService;
 import net.onlinelibrary.util.NumberNormalizer;
+import net.onlinelibrary.validator.Validator;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
@@ -16,9 +18,11 @@ import java.util.Optional;
 @Service
 public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepo;
+    private final Validator<Comment> commentValidator;
 
-    public CommentServiceImpl(CommentRepository commentRepo) {
+    public CommentServiceImpl(CommentRepository commentRepo, Validator<Comment> commentValidator) {
         this.commentRepo = commentRepo;
+        this.commentValidator = commentValidator;
     }
 
     @Override
@@ -54,7 +58,8 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public Comment saveComment(Comment comment) {
+    public Comment saveComment(Comment comment) throws ValidationException {
+        commentValidator.validate(comment);
         return commentRepo.save(comment);
     }
 
