@@ -11,6 +11,7 @@ import net.onlinelibrary.mapper.GenreMapper;
 import net.onlinelibrary.model.Author;
 import net.onlinelibrary.service.AuthorService;
 import org.springframework.beans.BeanUtils;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -19,8 +20,8 @@ import java.util.stream.Stream;
 @RestController
 @RequestMapping("api/authors")
 public class AuthorController {
-
     private final AuthorService authorService;
+
     private final AuthorMapper authorMapper;
     private final BookMapper bookMapper;
     private final GenreMapper genreMapper;
@@ -75,6 +76,7 @@ public class AuthorController {
 
 
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("")
     public AuthorDto saveAuthor(@RequestBody AuthorDto dto) {
         Author author = authorMapper.toEntity(dto);
@@ -86,6 +88,7 @@ public class AuthorController {
         return authorMapper.toDto(authorService.saveAuthor(author));
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("{id}")
     public AuthorDto fullUpdateAuthor(@PathVariable("id") Long authorId, @RequestBody AuthorDto dto) {
         try {
@@ -104,6 +107,7 @@ public class AuthorController {
         }
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PatchMapping("{id}")
     public AuthorDto partUpdateAuthor(@PathVariable("id") Long authorId, @RequestBody AuthorDto dto) {
         try {
@@ -131,6 +135,7 @@ public class AuthorController {
 
 
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("{id}")
     public void deleteAuthor(@PathVariable("id") Long authorId) {
         try {

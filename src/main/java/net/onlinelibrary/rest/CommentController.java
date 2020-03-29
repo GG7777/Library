@@ -1,16 +1,18 @@
 package net.onlinelibrary.rest;
 
+import net.onlinelibrary.authorization.UserPrincipalImpl;
 import net.onlinelibrary.dto.*;
-import net.onlinelibrary.exception.BadRequestException;
-import net.onlinelibrary.exception.CommentException;
-import net.onlinelibrary.exception.NotFoundException;
-import net.onlinelibrary.exception.ValidationException;
+import net.onlinelibrary.exception.*;
 import net.onlinelibrary.mapper.BookMapper;
 import net.onlinelibrary.mapper.CommentMapper;
 import net.onlinelibrary.mapper.UserMapper;
 import net.onlinelibrary.model.Comment;
+import net.onlinelibrary.model.Role;
+import net.onlinelibrary.model.User;
 import net.onlinelibrary.service.CommentService;
 import org.springframework.beans.BeanUtils;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -20,6 +22,7 @@ import java.util.stream.Stream;
 @RequestMapping("api/comments")
 public class CommentController {
     private final CommentService commentService;
+
     private final CommentMapper commentMapper;
     private final BookMapper bookMapper;
     private final UserMapper userMapper;
@@ -68,6 +71,7 @@ public class CommentController {
 
 
 
+    @PreAuthorize("hasAuthority('USER')")
     @PostMapping("")
     public CommentDto saveComment(@RequestBody CommentDto dto) {
         Comment comment = commentMapper.toEntity(dto);
@@ -85,10 +89,15 @@ public class CommentController {
         }
     }
 
+    @PreAuthorize("hasAuthority('USER')")
     @PutMapping("{id}")
     public CommentDto fullUpdateComment(@PathVariable("id") Long commentId, @RequestBody CommentDto dto) {
         try {
             Comment comment = commentService.getById(commentId);
+            User authorizedUser = ((UserPrincipalImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
+            if (!authorizedUser.getId().equals(comment.getUser().getId()) && !authorizedUser.getRoles().contains(Role.KOSTYAN))
+                throw new ForbiddenException("You do not have access to modify comment");
+
             Comment commentByDto = commentMapper.toEntity(dto);
 
             commentByDto.setId(comment.getId());
@@ -105,10 +114,15 @@ public class CommentController {
         }
     }
 
+    @PreAuthorize("hasAuthority('USER')")
     @PatchMapping("{id}")
     public CommentDto partUpdateComment(@PathVariable("id") Long commentId, @RequestBody CommentDto dto) {
         try {
             Comment comment = commentService.getById(commentId);
+            User authorizedUser = ((UserPrincipalImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
+            if (!authorizedUser.getId().equals(comment.getUser().getId()) && !authorizedUser.getRoles().contains(Role.KOSTYAN))
+                throw new ForbiddenException("You do not have access to modify comment");
+
             Comment commentByDto = commentMapper.toEntity(dto);
 
             if (commentByDto.getBook() != null)
@@ -132,9 +146,15 @@ public class CommentController {
 
 
 
+    @PreAuthorize("hasAuthority('USER')")
     @DeleteMapping("{id}")
     public void deleteComment(@PathVariable("id") Long commentId) {
         try {
+            Comment comment = commentService.getById(commentId);
+            User authorizedUser = ((UserPrincipalImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
+            if (!authorizedUser.getId().equals(comment.getUser().getId()) && !authorizedUser.getRoles().contains(Role.KOSTYAN))
+                throw new ForbiddenException("You do not have access to modify comment");
+
             commentService.deleteById(commentId);
         } catch (CommentException e) {
             throw new NotFoundException(e.getMessage());

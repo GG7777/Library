@@ -11,6 +11,7 @@ import net.onlinelibrary.service.UserService;
 import net.onlinelibrary.util.NumberNormalizer;
 import net.onlinelibrary.validator.Validator;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,10 +22,12 @@ import java.util.Set;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepo;
     private final Validator<User> userValidator;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepository userRepo, Validator<User> userValidator) {
+    public UserServiceImpl(UserRepository userRepo, Validator<User> userValidator, PasswordEncoder passwordEncoder) {
         this.userRepo = userRepo;
         this.userValidator = userValidator;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -67,6 +70,8 @@ public class UserServiceImpl implements UserService {
         {
             if(userRepo.findByUsernameOrEmail(user.getUsername(), user.getEmail()).isPresent())
                 throw new UserAlreadyExistsException("User with login=\'"+user.getUsername()+"\' and email=\'"+user.getEmail()+"\' is already exist");
+
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
         }
 
         return userRepo.save(user);

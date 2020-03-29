@@ -13,6 +13,7 @@ import net.onlinelibrary.mapper.GenreMapper;
 import net.onlinelibrary.model.Book;
 import net.onlinelibrary.service.BookService;
 import org.springframework.beans.BeanUtils;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -21,8 +22,8 @@ import java.util.stream.Stream;
 @RestController
 @RequestMapping("api/books")
 public class BookController {
-
     private final BookService bookService;
+
     private final BookMapper bookMapper;
     private final AuthorMapper authorMapper;
     private final GenreMapper genreMapper;
@@ -91,6 +92,7 @@ public class BookController {
 
 
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("")
     public BookDto saveBook(@RequestBody BookDto dto) {
         Book book = bookMapper.toEntity(dto);
@@ -104,6 +106,7 @@ public class BookController {
         return bookMapper.toDto(bookService.saveBook(book));
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("{id}")
     public BookDto fullUpdateBook(@PathVariable("id") Long bookId, @RequestBody BookDto dto) {
         try {
@@ -122,6 +125,7 @@ public class BookController {
         }
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PatchMapping("{id}")
     public BookDto partUpdateBook(@PathVariable("id") Long bookId, @RequestBody BookDto dto) {
         try {
@@ -157,6 +161,7 @@ public class BookController {
 
 
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("{id}")
     public void deleteBook(@PathVariable("id") Long bookId) {
         try {

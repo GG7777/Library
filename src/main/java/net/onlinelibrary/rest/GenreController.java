@@ -11,6 +11,7 @@ import net.onlinelibrary.mapper.GenreMapper;
 import net.onlinelibrary.model.Genre;
 import net.onlinelibrary.service.GenreService;
 import org.springframework.beans.BeanUtils;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -19,7 +20,6 @@ import java.util.stream.Stream;
 @RestController
 @RequestMapping("api/genres")
 public class GenreController {
-
     private final GenreService genreService;
 
     private final GenreMapper genreMapper;
@@ -76,6 +76,7 @@ public class GenreController {
 
 
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("")
     public GenreDto saveGenre(@RequestBody GenreDto dto) {
         Genre genre = genreMapper.toEntity(dto);
@@ -87,6 +88,7 @@ public class GenreController {
         return genreMapper.toDto(genreService.saveGenre(genre));
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("{id}")
     public GenreDto fullUpdateGenre(@PathVariable("id") Long genreId, @RequestBody GenreDto dto) {
         try {
@@ -105,6 +107,7 @@ public class GenreController {
         }
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PatchMapping("{id}")
     public GenreDto partUpdateGenre(@PathVariable("id") Long genreId, @RequestBody GenreDto dto) {
         try {
@@ -127,7 +130,7 @@ public class GenreController {
     }
 
 
-
+    @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("{id}")
     public void deleteGenre(@PathVariable("id") Long genreId) {
         try {
