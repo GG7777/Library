@@ -25,8 +25,8 @@ public class GenreServiceImpl implements GenreService {
     public List<Genre> getByRange(Integer begin, Integer count) {
         List<Genre> genres = genreRepo.findAll();
         return genres.subList(
-                NumberNormalizer.normalize(begin, 0, genres.size() - 1),
-                NumberNormalizer.normalize(begin + count - 1, 0, genres.size() - 1)
+                NumberNormalizer.normalize(begin, 0, genres.size() == 0 ? 0 : genres.size() - 1),
+                NumberNormalizer.normalize(begin + count - 1, 0, genres.size() == 0 ? 0 : genres.size() - 1)
         );
     }
 

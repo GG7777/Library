@@ -29,8 +29,8 @@ public class CommentServiceImpl implements CommentService {
     public List<Comment> getByRange(Integer begin, Integer count) {
         List<Comment> comments = commentRepo.findAll();
         return comments.subList(
-                NumberNormalizer.normalize(begin, 0, comments.size() - 1),
-                NumberNormalizer.normalize(begin + count - 1, 0, comments.size() - 1));
+                NumberNormalizer.normalize(begin, 0, comments.size() == 0 ? 0 : comments.size() - 1),
+                NumberNormalizer.normalize(begin + count - 1, 0, comments.size() == 0 ? 0 : comments.size() - 1));
     }
 
     @Override

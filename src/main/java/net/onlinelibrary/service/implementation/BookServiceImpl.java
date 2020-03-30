@@ -27,8 +27,8 @@ public class BookServiceImpl implements BookService {
         List<Book> books = bookRepo.findAll();
 
         return books.subList(
-                NumberNormalizer.normalize(begin, 0, books.size() - 1),
-                NumberNormalizer.normalize(begin + count - 1, 0, books.size() - 1));
+                NumberNormalizer.normalize(begin, 0, books.size() == 0 ? 0 : books.size() - 1),
+                NumberNormalizer.normalize(begin + count - 1, 0, books.size() == 0 ? 0 : books.size() - 1));
     }
 
     @Override

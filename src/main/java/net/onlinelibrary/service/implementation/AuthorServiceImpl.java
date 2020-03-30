@@ -26,8 +26,8 @@ public class AuthorServiceImpl implements AuthorService {
         List<Author> authors = authorRepo.findAll();
 
         return authors.subList(
-                NumberNormalizer.normalize(begin, 0, authors.size() - 1),
-                NumberNormalizer.normalize(begin + count - 1, 0, authors.size() - 1));
+                NumberNormalizer.normalize(begin, 0, authors.size() == 0 ? 0 : authors.size() - 1),
+                NumberNormalizer.normalize(begin + count - 1, 0, authors.size() == 0 ? 0 : authors.size() - 1));
     }
 
     @Override
