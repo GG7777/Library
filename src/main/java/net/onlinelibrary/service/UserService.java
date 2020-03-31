@@ -22,4 +22,6 @@ public interface UserService {
     User saveUser(User user) throws UserAlreadyExistsException, ValidationException;
 
     void deleteById(Long userId) throws UserNotFoundException;
+
+    User getByUsername(String username) throws UserNotFoundException;
 }

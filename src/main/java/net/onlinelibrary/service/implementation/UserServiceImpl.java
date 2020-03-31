@@ -47,6 +47,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User getByUsername(String username) throws UserNotFoundException {
+        Optional<User> userOpt = userRepo.findByUsername(username);
+        if (!userOpt.isPresent())
+            throw new UserNotFoundException("User with username \'" + username + "\' has not found");
+        return userOpt.get();
+    }
+
+    @Override
     public List<Comment> getCommentsOfUser(Long userId) throws UserNotFoundException {
         Optional<User> userOpt = userRepo.findById(userId);
         if(!userOpt.isPresent())

@@ -1,6 +1,5 @@
 package net.onlinelibrary.rest;
 
-import net.onlinelibrary.authorization.UserPrincipalImpl;
 import net.onlinelibrary.dto.*;
 import net.onlinelibrary.exception.*;
 import net.onlinelibrary.mapper.BookMapper;
@@ -9,6 +8,7 @@ import net.onlinelibrary.mapper.UserMapper;
 import net.onlinelibrary.model.Comment;
 import net.onlinelibrary.model.Role;
 import net.onlinelibrary.model.User;
+import net.onlinelibrary.security.jwt.JwtUserDetails;
 import net.onlinelibrary.service.CommentService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -94,7 +94,7 @@ public class CommentController {
     public CommentDto fullUpdateComment(@PathVariable("id") Long commentId, @RequestBody CommentDto dto) {
         try {
             Comment comment = commentService.getById(commentId);
-            User authorizedUser = ((UserPrincipalImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
+            User authorizedUser = ((JwtUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
             if (!authorizedUser.getId().equals(comment.getUser().getId()) && !authorizedUser.getRoles().contains(Role.KOSTYAN))
                 throw new ForbiddenException("You do not have access to modify comment");
 
@@ -119,7 +119,7 @@ public class CommentController {
     public CommentDto partUpdateComment(@PathVariable("id") Long commentId, @RequestBody CommentDto dto) {
         try {
             Comment comment = commentService.getById(commentId);
-            User authorizedUser = ((UserPrincipalImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
+            User authorizedUser = ((JwtUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
             if (!authorizedUser.getId().equals(comment.getUser().getId()) && !authorizedUser.getRoles().contains(Role.KOSTYAN))
                 throw new ForbiddenException("You do not have access to modify comment");
 
@@ -151,7 +151,7 @@ public class CommentController {
     public void deleteComment(@PathVariable("id") Long commentId) {
         try {
             Comment comment = commentService.getById(commentId);
-            User authorizedUser = ((UserPrincipalImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
+            User authorizedUser = ((JwtUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
             if (!authorizedUser.getId().equals(comment.getUser().getId()) && !authorizedUser.getRoles().contains(Role.KOSTYAN))
                 throw new ForbiddenException("You do not have access to modify comment");
 

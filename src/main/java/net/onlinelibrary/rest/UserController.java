@@ -1,6 +1,5 @@
 package net.onlinelibrary.rest;
 
-import net.onlinelibrary.authorization.UserPrincipalImpl;
 import net.onlinelibrary.dto.CommentDto;
 import net.onlinelibrary.dto.UserDto;
 import net.onlinelibrary.exception.*;
@@ -8,6 +7,7 @@ import net.onlinelibrary.mapper.CommentMapper;
 import net.onlinelibrary.mapper.UserMapper;
 import net.onlinelibrary.model.Role;
 import net.onlinelibrary.model.User;
+import net.onlinelibrary.security.jwt.JwtUserDetails;
 import net.onlinelibrary.service.UserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -98,7 +98,7 @@ public class UserController {
     @PutMapping("{id}")
     public UserDto fullUpdateUser(@PathVariable("id") Long userId, @RequestBody UserDto dto) {
         try {
-            User authorizedUser = ((UserPrincipalImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
+            User authorizedUser = ((JwtUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
             if (!authorizedUser.getId().equals(userId) && !authorizedUser.getRoles().contains(Role.KOSTYAN))
                 throw new ForbiddenException("You do not have access to modify user");
 
@@ -130,7 +130,7 @@ public class UserController {
     @PatchMapping("{id}")
     public UserDto partUpdateUser(@PathVariable("id") Long userId, @RequestBody UserDto dto) {
         try {
-            User authorizedUser = ((UserPrincipalImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
+            User authorizedUser = ((JwtUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
             if (!authorizedUser.getId().equals(userId) && !authorizedUser.getRoles().contains(Role.KOSTYAN))
                 throw new ForbiddenException("You do not have access to modify user");
 
@@ -168,7 +168,7 @@ public class UserController {
     @DeleteMapping("{id}")
     public void deleteUser(@PathVariable("id") Long userId, HttpSession session) {
         try {
-            User authorizedUser = ((UserPrincipalImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
+            User authorizedUser = ((JwtUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
             if (!authorizedUser.getId().equals(userId) && !authorizedUser.getRoles().contains(Role.KOSTYAN))
                 throw new ForbiddenException("You do not have access to delete user");
 
