@@ -35,8 +35,7 @@ public class UserServiceImpl implements UserService {
         List<User> users = userRepo.findAll();
         return users.subList(
                 NumberNormalizer.normalize(begin, 0, users.size() == 0 ? 0 : users.size() - 1),
-                NumberNormalizer.normalize(begin + count - 1, 0, users.size() == 0 ? 0 : users.size() - 1)
-        );
+                NumberNormalizer.normalize(begin + count - 1, 0, users.size()));
     }
 
     @Override
