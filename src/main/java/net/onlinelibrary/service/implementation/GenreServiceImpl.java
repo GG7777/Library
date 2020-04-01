@@ -26,7 +26,7 @@ public class GenreServiceImpl implements GenreService {
         List<Genre> genres = genreRepo.findAll();
         return genres.subList(
                 NumberNormalizer.normalize(begin, 0, genres.size() == 0 ? 0 : genres.size() - 1),
-                NumberNormalizer.normalize(begin + count - 1, 0, genres.size()));
+                NumberNormalizer.normalize(begin + count, 0, genres.size()));
     }
 
     @Override

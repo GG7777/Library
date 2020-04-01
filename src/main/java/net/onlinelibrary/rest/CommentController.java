@@ -8,11 +8,12 @@ import net.onlinelibrary.mapper.UserMapper;
 import net.onlinelibrary.model.Comment;
 import net.onlinelibrary.model.Role;
 import net.onlinelibrary.model.User;
-import net.onlinelibrary.security.jwt.JwtUserDetails;
 import net.onlinelibrary.service.CommentService;
+import net.onlinelibrary.service.UserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -26,12 +27,19 @@ public class CommentController {
     private final CommentMapper commentMapper;
     private final BookMapper bookMapper;
     private final UserMapper userMapper;
+    private final UserService userService;
 
-    public CommentController(CommentService commentService, CommentMapper commentMapper, BookMapper bookMapper, UserMapper userMapper) {
+    public CommentController(
+            CommentService commentService,
+            CommentMapper commentMapper,
+            BookMapper bookMapper,
+            UserMapper userMapper,
+            UserService userService) {
         this.commentService = commentService;
         this.commentMapper = commentMapper;
         this.bookMapper = bookMapper;
         this.userMapper = userMapper;
+        this.userService = userService;
     }
 
     @GetMapping("")
@@ -94,9 +102,8 @@ public class CommentController {
     public CommentDto fullUpdateComment(@PathVariable("id") Long commentId, @RequestBody CommentDto dto) {
         try {
             Comment comment = commentService.getById(commentId);
-            User authorizedUser = ((JwtUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
-            if (!authorizedUser.getId().equals(comment.getUser().getId()) && !authorizedUser.getRoles().contains(Role.KOSTYAN))
-                throw new ForbiddenException("You do not have access to modify comment");
+
+            checkAccessRights(comment.getUser().getId());
 
             Comment commentByDto = commentMapper.toEntity(dto);
 
@@ -119,9 +126,8 @@ public class CommentController {
     public CommentDto partUpdateComment(@PathVariable("id") Long commentId, @RequestBody CommentDto dto) {
         try {
             Comment comment = commentService.getById(commentId);
-            User authorizedUser = ((JwtUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
-            if (!authorizedUser.getId().equals(comment.getUser().getId()) && !authorizedUser.getRoles().contains(Role.KOSTYAN))
-                throw new ForbiddenException("You do not have access to modify comment");
+
+            checkAccessRights(comment.getUser().getId());
 
             Comment commentByDto = commentMapper.toEntity(dto);
 
@@ -151,13 +157,32 @@ public class CommentController {
     public void deleteComment(@PathVariable("id") Long commentId) {
         try {
             Comment comment = commentService.getById(commentId);
-            User authorizedUser = ((JwtUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
-            if (!authorizedUser.getId().equals(comment.getUser().getId()) && !authorizedUser.getRoles().contains(Role.KOSTYAN))
-                throw new ForbiddenException("You do not have access to modify comment");
+
+            checkAccessRights(comment.getUser().getId());
 
             commentService.deleteById(commentId);
         } catch (CommentException e) {
             throw new NotFoundException(e.getMessage());
         }
+    }
+
+    private void checkAccessRights(Long userId) {
+        String authorizedUsername = ((UserDetails)SecurityContextHolder
+                    .getContext()
+                    .getAuthentication()
+                    .getPrincipal())
+                .getUsername();
+
+        ForbiddenException exception = new ForbiddenException("You do not have access to change comment");
+
+        User user = null;
+        try {
+            user = userService.getByUsername(authorizedUsername);
+        } catch (UserNotFoundException e) {
+            throw exception;
+        }
+
+        if (!user.getId().equals(userId) && !user.getRoles().contains(Role.KOSTYAN))
+            throw exception;
     }
 }

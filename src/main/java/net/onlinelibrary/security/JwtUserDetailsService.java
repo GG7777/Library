@@ -1,6 +1,7 @@
 package net.onlinelibrary.security;
 
 import net.onlinelibrary.exception.UserNotFoundException;
+import net.onlinelibrary.model.User;
 import net.onlinelibrary.security.jwt.JwtUserDetails;
 import net.onlinelibrary.service.UserService;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,9 +20,10 @@ public class JwtUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         try {
-            return new JwtUserDetails(userService.getByUsername(username));
+            User user = userService.getByUsername(username);
+            return new JwtUserDetails(user);
         } catch (UserNotFoundException e) {
-            throw new UsernameNotFoundException(e.getMessage());
+            return null;
         }
     }
 }

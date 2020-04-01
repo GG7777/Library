@@ -26,7 +26,11 @@ public class GenreController {
     private final BookMapper bookMapper;
     private final AuthorMapper authorMapper;
 
-    public GenreController(GenreService genreService, GenreMapper genreMapper, BookMapper bookMapper, AuthorMapper authorMapper) {
+    public GenreController(
+            GenreService genreService,
+            GenreMapper genreMapper,
+            BookMapper bookMapper,
+            AuthorMapper authorMapper) {
         this.genreService = genreService;
         this.genreMapper = genreMapper;
         this.bookMapper = bookMapper;

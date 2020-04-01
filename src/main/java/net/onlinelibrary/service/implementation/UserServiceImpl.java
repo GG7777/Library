@@ -10,6 +10,7 @@ import net.onlinelibrary.repository.UserRepository;
 import net.onlinelibrary.service.UserService;
 import net.onlinelibrary.util.NumberNormalizer;
 import net.onlinelibrary.validator.Validator;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,7 @@ public class UserServiceImpl implements UserService {
     private final Validator<User> userValidator;
     private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepository userRepo, Validator<User> userValidator, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepo, Validator<User> userValidator, @Lazy PasswordEncoder passwordEncoder) {
         this.userRepo = userRepo;
         this.userValidator = userValidator;
         this.passwordEncoder = passwordEncoder;
@@ -35,7 +36,7 @@ public class UserServiceImpl implements UserService {
         List<User> users = userRepo.findAll();
         return users.subList(
                 NumberNormalizer.normalize(begin, 0, users.size() == 0 ? 0 : users.size() - 1),
-                NumberNormalizer.normalize(begin + count - 1, 0, users.size()));
+                NumberNormalizer.normalize(begin + count, 0, users.size()));
     }
 
     @Override

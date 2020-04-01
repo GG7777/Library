@@ -18,10 +18,6 @@ public class JwtUserDetails implements UserDetails {
         this.user = user;
     }
 
-    public User getUser() {
-        return user;
-    }
-
     @Override
     public String getUsername() {
         return user.getUsername();
@@ -54,11 +50,12 @@ public class JwtUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return user.isActive();
     }
 
     private List<GrantedAuthority> mapToGrantedAuthorities(Set<Role> userRoles) {
-        return userRoles.stream()
+        return userRoles
+                .stream()
                 .map(role -> new SimpleGrantedAuthority(role.name()))
                 .collect(Collectors.toList());
     }

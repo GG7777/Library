@@ -7,14 +7,13 @@ import net.onlinelibrary.mapper.CommentMapper;
 import net.onlinelibrary.mapper.UserMapper;
 import net.onlinelibrary.model.Role;
 import net.onlinelibrary.model.User;
-import net.onlinelibrary.security.jwt.JwtUserDetails;
 import net.onlinelibrary.service.UserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
@@ -98,12 +97,7 @@ public class UserController {
     @PutMapping("{id}")
     public UserDto fullUpdateUser(@PathVariable("id") Long userId, @RequestBody UserDto dto) {
         try {
-            User authorizedUser = ((JwtUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
-            if (!authorizedUser.getId().equals(userId) && !authorizedUser.getRoles().contains(Role.KOSTYAN))
-                throw new ForbiddenException("You do not have access to modify user");
-
-            if (!authorizedUser.getRoles().contains(Role.KOSTYAN) && dto.getRoles() != null)
-                throw new ForbiddenException("You do not have access to set user roles");
+            checkAccessRights(userId, dto.getRoles() != null);
 
             User user = userService.getById(userId);
             User userByDto = userMapper.toEntity(dto);
@@ -130,12 +124,7 @@ public class UserController {
     @PatchMapping("{id}")
     public UserDto partUpdateUser(@PathVariable("id") Long userId, @RequestBody UserDto dto) {
         try {
-            User authorizedUser = ((JwtUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
-            if (!authorizedUser.getId().equals(userId) && !authorizedUser.getRoles().contains(Role.KOSTYAN))
-                throw new ForbiddenException("You do not have access to modify user");
-
-            if (!authorizedUser.getRoles().contains(Role.KOSTYAN) && dto.getRoles() != null)
-                throw new ForbiddenException("You do not have access to set user roles");
+            checkAccessRights(userId, dto.getRoles() != null);
 
             User user = userService.getById(userId);
             User userByDto = userMapper.toEntity(dto);
@@ -166,16 +155,36 @@ public class UserController {
 
     @PreAuthorize("hasAuthority('USER')")
     @DeleteMapping("{id}")
-    public void deleteUser(@PathVariable("id") Long userId, HttpSession session) {
+    public void deleteUser(@PathVariable("id") Long userId) {
         try {
-            User authorizedUser = ((JwtUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
-            if (!authorizedUser.getId().equals(userId) && !authorizedUser.getRoles().contains(Role.KOSTYAN))
-                throw new ForbiddenException("You do not have access to delete user");
+            checkAccessRights(userId, false);
 
             userService.deleteById(userId);
-            session.invalidate();
         } catch (UserNotFoundException e) {
             throw new NotFoundException(e.getMessage());
         }
+    }
+
+    private void checkAccessRights(Long userId, boolean checkAccessToChangeRoles) {
+        String authorizedUsername = ((UserDetails)SecurityContextHolder
+                    .getContext()
+                    .getAuthentication()
+                    .getPrincipal())
+                .getUsername();
+
+        ForbiddenException exception = new ForbiddenException("You do not have access to change user");
+
+        User user = null;
+        try {
+            user = userService.getByUsername(authorizedUsername);
+        } catch (UserNotFoundException e) {
+            throw exception;
+        }
+
+        if (!user.getId().equals(userId) && !user.getRoles().contains(Role.KOSTYAN))
+            throw exception;
+
+        if (checkAccessToChangeRoles && !user.getRoles().contains(Role.KOSTYAN))
+            throw exception;
     }
 }
