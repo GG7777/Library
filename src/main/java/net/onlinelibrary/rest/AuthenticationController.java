@@ -1,7 +1,7 @@
 package net.onlinelibrary.rest;
 
 import net.onlinelibrary.dto.UserDto;
-import net.onlinelibrary.exception.NotFoundException;
+import net.onlinelibrary.exception.withResponseStatus.NotFoundException;
 import net.onlinelibrary.exception.UserNotFoundException;
 import net.onlinelibrary.model.User;
 import net.onlinelibrary.security.jwt.JwtTokenProvider;

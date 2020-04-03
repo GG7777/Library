@@ -1,5 +1,6 @@
 package net.onlinelibrary.service.implementation;
 
+import lombok.extern.slf4j.Slf4j;
 import net.onlinelibrary.exception.UserAlreadyExistsException;
 import net.onlinelibrary.exception.UserNotFoundException;
 import net.onlinelibrary.exception.ValidationException;
@@ -15,10 +16,12 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+@Slf4j
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepo;
@@ -32,47 +35,68 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getByRange(Integer begin, Integer count) {
-        List<User> users = userRepo.findAll();
-        return users.subList(
-                NumberNormalizer.normalize(begin, 0, users.size() == 0 ? 0 : users.size() - 1),
-                NumberNormalizer.normalize(begin + count, 0, users.size()));
+    public List<User> getByRange(@NotNull Integer begin, @NotNull Integer count) {
+        List<User> allUsers = userRepo.findAll();
+
+        List<User> userInRange = allUsers.subList(
+                NumberNormalizer.normalize(begin, 0, allUsers.size() == 0 ? 0 : allUsers.size() - 1),
+                NumberNormalizer.normalize(begin + count, 0, allUsers.size()));
+
+        log.info("IN getByRange - found " + userInRange.size() + " users");
+
+        return userInRange;
     }
 
     @Override
-    public User getById(Long userId) throws UserNotFoundException {
+    public User getById(@NotNull Long userId) throws UserNotFoundException {
         Optional<User> userOpt = userRepo.findById(userId);
-        if(!userOpt.isPresent())
+        if(!userOpt.isPresent()) {
+            log.warn("IN getById - user with id " + userId + " has not found");
             throw new UserNotFoundException("User with id \'" + userId + "\' has not found");
-        return userOpt.get();
+        }
+        User user = userOpt.get();
+        log.info("IN getById - user with id " + user.getId() + " found");
+        return user;
     }
 
     @Override
-    public User getByUsername(String username) throws UserNotFoundException {
+    public User getByUsername(@NotNull String username) throws UserNotFoundException {
         Optional<User> userOpt = userRepo.findByUsername(username);
-        if (!userOpt.isPresent())
+        if (!userOpt.isPresent()) {
+            log.warn("IN getByUsername - user with username " + username + " has not found");
             throw new UserNotFoundException("User with username \'" + username + "\' has not found");
-        return userOpt.get();
+        }
+        User user = userOpt.get();
+        log.info("IN getByUsername - user with id " + user.getId() + " found");
+        return user;
     }
 
     @Override
-    public List<Comment> getCommentsOfUser(Long userId) throws UserNotFoundException {
+    public List<Comment> getCommentsOfUser(@NotNull Long userId) throws UserNotFoundException {
         Optional<User> userOpt = userRepo.findById(userId);
-        if(!userOpt.isPresent())
+        if(!userOpt.isPresent()) {
+            log.warn("IN getCommentsOfUser - user with id " + userId + " has not found");
             throw new UserNotFoundException("User with id \'" + userId + "\' has not found");
-        return userOpt.get().getComments();
+        }
+        List<Comment> comments = userOpt.get().getComments();
+        log.info("IN getCommentsOfUser - found " + comments.size() + " comments of user with id " + userId);
+        return comments;
     }
 
     @Override
-    public Set<Role> getRolesOfUser(Long userId) throws UserNotFoundException {
+    public Set<Role> getRolesOfUser(@NotNull Long userId) throws UserNotFoundException {
         Optional<User> userOpt = userRepo.findById(userId);
-        if(!userOpt.isPresent())
+        if(!userOpt.isPresent()) {
+            log.warn("IN getRolesOfUser - user with id " + userId + " has not found");
             throw new UserNotFoundException("User with id \'" + userId + "\' has not found");
-        return userOpt.get().getRoles();
+        }
+        Set<Role> roles = userOpt.get().getRoles();
+        log.info("IN getRolesOfUser - found " + roles.size() + " roles of user with id " + userId);
+        return roles;
     }
 
     @Override
-    public User saveUser(User user) throws UserAlreadyExistsException, ValidationException {
+    public User saveUser(@NotNull User user) throws UserAlreadyExistsException, ValidationException {
         userValidator.validate(user);
         if(user.getId() == null)
         {
@@ -86,12 +110,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteById(Long userId) throws UserNotFoundException {
+    public void deleteById(@NotNull Long userId) throws UserNotFoundException {
         try {
             userRepo.deleteById(userId);
+            log.info("IN deleteById - user with id " + userId + " deleted");
         }
         catch (EmptyResultDataAccessException e)
         {
+            log.warn("IN deleteById - user with id " + userId + " has not found");
             throw new UserNotFoundException("User with id \'" + userId + "\' has not found");
         }
     }

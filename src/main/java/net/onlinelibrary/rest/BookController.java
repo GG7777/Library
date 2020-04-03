@@ -5,7 +5,7 @@ import net.onlinelibrary.dto.BookDto;
 import net.onlinelibrary.dto.CommentDto;
 import net.onlinelibrary.dto.GenreDto;
 import net.onlinelibrary.exception.BookException;
-import net.onlinelibrary.exception.NotFoundException;
+import net.onlinelibrary.exception.withResponseStatus.NotFoundException;
 import net.onlinelibrary.mapper.AuthorMapper;
 import net.onlinelibrary.mapper.BookMapper;
 import net.onlinelibrary.mapper.CommentMapper;

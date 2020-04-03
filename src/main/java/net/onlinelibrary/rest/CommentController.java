@@ -2,6 +2,9 @@ package net.onlinelibrary.rest;
 
 import net.onlinelibrary.dto.*;
 import net.onlinelibrary.exception.*;
+import net.onlinelibrary.exception.withResponseStatus.BadRequestException;
+import net.onlinelibrary.exception.withResponseStatus.ForbiddenException;
+import net.onlinelibrary.exception.withResponseStatus.NotFoundException;
 import net.onlinelibrary.mapper.BookMapper;
 import net.onlinelibrary.mapper.CommentMapper;
 import net.onlinelibrary.mapper.UserMapper;
