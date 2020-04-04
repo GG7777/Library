@@ -1,25 +1,17 @@
 package net.onlinelibrary.rest;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import net.onlinelibrary.dto.CommentDto;
 import net.onlinelibrary.dto.UserDto;
-import net.onlinelibrary.exception.*;
-import net.onlinelibrary.exception.withResponseStatus.AlreadyExistsException;
-import net.onlinelibrary.exception.withResponseStatus.BadRequestException;
-import net.onlinelibrary.exception.withResponseStatus.ForbiddenException;
+import net.onlinelibrary.dto.view.Views;
+import net.onlinelibrary.exception.UserNotFoundException;
 import net.onlinelibrary.exception.withResponseStatus.NotFoundException;
 import net.onlinelibrary.mapper.CommentMapper;
 import net.onlinelibrary.mapper.UserMapper;
 import net.onlinelibrary.model.Role;
-import net.onlinelibrary.model.User;
 import net.onlinelibrary.service.UserService;
-import org.springframework.beans.BeanUtils;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
-import java.util.Date;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -38,14 +30,16 @@ public class UserController {
     }
 
     @GetMapping("")
-    public Stream<UserDto> getUsersInRange(@RequestParam Integer begin, @RequestParam Integer count) {
+    @JsonView(Views.ForEvery.class)
+    public Stream<UserDto> getUsersInRange(@RequestParam Integer offset, @RequestParam Integer count) {
         return userService
-                .getByRange(begin, count)
+                .getByRange(offset, count)
                 .stream()
                 .map(user -> userMapper.toDto(user));
     }
 
     @GetMapping("{id}")
+    @JsonView(Views.ForEvery.class)
     public UserDto getUserById(@PathVariable("id") Long userId) {
         try {
             return userMapper.toDto(userService.getById(userId));
@@ -55,6 +49,7 @@ public class UserController {
     }
 
     @GetMapping("{id}/comments")
+    @JsonView(Views.ForEvery.class)
     public Stream<CommentDto> getCommentsOfUser(@PathVariable("id") Long userId) {
         try {
             return userService
@@ -67,128 +62,12 @@ public class UserController {
     }
 
     @GetMapping("{id}/roles")
+    @JsonView(Views.ForEvery.class)
     public Set<Role> getRolesOfUser(@PathVariable("id") Long userId) {
         try {
             return userService.getRolesOfUser(userId);
         } catch (UserNotFoundException e) {
             throw new NotFoundException(e.getMessage());
         }
-    }
-
-
-
-    @PostMapping("")
-    public UserDto saveUser(@RequestBody UserDto dto) {
-        User user = userMapper.toEntity(dto);
-
-        user.setId(null);
-        user.setCreatedDate(new Date());
-        user.setLastModifiedDate(new Date());
-
-        user.setActive(true);
-        user.setRoles(Collections.singleton(Role.USER));
-
-        try {
-            return userMapper.toDto(userService.saveUser(user));
-        } catch (UserAlreadyExistsException e) {
-            throw new AlreadyExistsException(e.getMessage());
-        } catch (ValidationException e) {
-            throw new BadRequestException(e.getMessage());
-        }
-    }
-
-    @PreAuthorize("hasAuthority('USER')")
-    @PutMapping("{id}")
-    public UserDto fullUpdateUser(@PathVariable("id") Long userId, @RequestBody UserDto dto) {
-        try {
-            checkAccessRights(userId, dto.getRoles() != null);
-
-            User user = userService.getById(userId);
-            User userByDto = userMapper.toEntity(dto);
-
-            userByDto.setId(user.getId());
-            userByDto.setCreatedDate(user.getCreatedDate());
-            userByDto.setLastModifiedDate(new Date());
-
-            userByDto.setActive(user.isActive());
-
-            BeanUtils.copyProperties(userByDto, user);
-
-            return userMapper.toDto(userService.saveUser(user));
-        } catch (UserNotFoundException e) {
-            throw new NotFoundException(e.getMessage());
-        } catch (UserAlreadyExistsException e) {
-            throw new AlreadyExistsException(e.getMessage());
-        } catch (ValidationException e) {
-            throw new BadRequestException(e.getMessage());
-        }
-    }
-
-    @PreAuthorize("hasAuthority('USER')")
-    @PatchMapping("{id}")
-    public UserDto partUpdateUser(@PathVariable("id") Long userId, @RequestBody UserDto dto) {
-        try {
-            checkAccessRights(userId, dto.getRoles() != null);
-
-            User user = userService.getById(userId);
-            User userByDto = userMapper.toEntity(dto);
-
-            if (userByDto.getComments() != null)
-                user.setComments(userByDto.getComments());
-            if (userByDto.getRoles() != null)
-                user.setRoles(userByDto.getRoles());
-            if (userByDto.getEmail() != null)
-                user.setEmail(userByDto.getEmail());
-            if (userByDto.getUsername() != null)
-                user.setUsername(userByDto.getUsername());
-            if (userByDto.getPassword() != null)
-                user.setPassword(userByDto.getPassword());
-
-            user.setLastModifiedDate(new Date());
-
-            return userMapper.toDto(userService.saveUser(user));
-        } catch (UserNotFoundException e) {
-            throw new NotFoundException(e.getMessage());
-        } catch (UserAlreadyExistsException e) {
-            throw new AlreadyExistsException(e.getMessage());
-        } catch (ValidationException e) {
-            throw new BadRequestException(e.getMessage());
-        }
-    }
-
-
-    @PreAuthorize("hasAuthority('USER')")
-    @DeleteMapping("{id}")
-    public void deleteUser(@PathVariable("id") Long userId) {
-        try {
-            checkAccessRights(userId, false);
-
-            userService.deleteById(userId);
-        } catch (UserNotFoundException e) {
-            throw new NotFoundException(e.getMessage());
-        }
-    }
-
-    private void checkAccessRights(Long userId, boolean checkAccessToChangeRoles) {
-        String authorizedUsername = ((UserDetails)SecurityContextHolder
-                    .getContext()
-                    .getAuthentication()
-                    .getPrincipal())
-                .getUsername();
-
-        ForbiddenException exception = new ForbiddenException("You do not have access to change user");
-
-        User user = null;
-        try {
-            user = userService.getByUsername(authorizedUsername);
-        } catch (UserNotFoundException e) {
-            throw exception;
-        }
-
-        if (!user.getId().equals(userId) && !user.getRoles().contains(Role.KOSTYAN))
-            throw exception;
-
-        if (checkAccessToChangeRoles && !user.getRoles().contains(Role.KOSTYAN))
-            throw exception;
     }
 }

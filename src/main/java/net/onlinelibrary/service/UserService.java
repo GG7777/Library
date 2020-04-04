@@ -1,6 +1,5 @@
 package net.onlinelibrary.service;
 
-import net.onlinelibrary.exception.UserAlreadyExistsException;
 import net.onlinelibrary.exception.UserNotFoundException;
 import net.onlinelibrary.exception.ValidationException;
 import net.onlinelibrary.model.Comment;
@@ -11,7 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 public interface UserService {
-    List<User> getByRange(Integer begin, Integer count);
+    List<User> getByRange(Integer offset, Integer count);
 
     User getById(Long userId) throws UserNotFoundException;
 
@@ -19,7 +18,15 @@ public interface UserService {
 
     Set<Role> getRolesOfUser(Long userId) throws UserNotFoundException;
 
-    User saveUser(User user) throws UserAlreadyExistsException, ValidationException;
+    User saveNewUser(User user) throws ValidationException;
+
+    User updateUserWithPasswordAndUsernameAndEmailExcluding(Long userId, User user) throws UserNotFoundException, ValidationException;
+
+    User updatePassword(Long userId, String newPassword) throws UserNotFoundException, ValidationException;
+
+    User updateUsername(Long userId, String newUsername) throws UserNotFoundException, ValidationException;
+
+    User updateEmail(Long userId, String newEmail) throws UserNotFoundException, ValidationException;
 
     void deleteById(Long userId) throws UserNotFoundException;
 

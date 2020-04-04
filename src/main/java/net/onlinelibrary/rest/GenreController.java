@@ -1,20 +1,18 @@
 package net.onlinelibrary.rest;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import net.onlinelibrary.dto.AuthorDto;
 import net.onlinelibrary.dto.BookDto;
 import net.onlinelibrary.dto.GenreDto;
+import net.onlinelibrary.dto.view.Views;
 import net.onlinelibrary.exception.GenreException;
 import net.onlinelibrary.exception.withResponseStatus.NotFoundException;
 import net.onlinelibrary.mapper.AuthorMapper;
 import net.onlinelibrary.mapper.BookMapper;
 import net.onlinelibrary.mapper.GenreMapper;
-import net.onlinelibrary.model.Genre;
 import net.onlinelibrary.service.GenreService;
-import org.springframework.beans.BeanUtils;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 import java.util.stream.Stream;
 
 @RestController
@@ -38,14 +36,16 @@ public class GenreController {
     }
 
     @GetMapping("")
-    public Stream<GenreDto> getGenresInRange(@RequestParam Integer begin, @RequestParam Integer count) {
+    @JsonView(Views.ForEvery.class)
+    public Stream<GenreDto> getGenresInRange(@RequestParam Integer offset, @RequestParam Integer count) {
         return genreService
-                .getByRange(begin, count)
+                .getByRange(offset, count)
                 .stream()
                 .map(genre -> genreMapper.toDto(genre));
     }
 
     @GetMapping("{id}")
+    @JsonView(Views.ForEvery.class)
     public GenreDto getGenreById(@PathVariable("id") Long genreId) {
         try {
             return genreMapper.toDto(genreService.getById(genreId));
@@ -55,6 +55,7 @@ public class GenreController {
     }
 
     @GetMapping("{id}/books")
+    @JsonView(Views.ForEvery.class)
     public Stream<BookDto> getBooksOfGenre(@PathVariable("id") Long genreId) {
         try {
             return genreService
@@ -67,78 +68,13 @@ public class GenreController {
     }
 
     @GetMapping("{id}/authors")
+    @JsonView(Views.ForEvery.class)
     public Stream<AuthorDto> getAuthorsOfGenre(@PathVariable("id") Long genreId) {
         try {
             return genreService
                     .getAuthorsOfGenre(genreId)
                     .stream()
                     .map(author -> authorMapper.toDto(author));
-        } catch (GenreException e) {
-            throw new NotFoundException(e.getMessage());
-        }
-    }
-
-
-
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @PostMapping("")
-    public GenreDto saveGenre(@RequestBody GenreDto dto) {
-        Genre genre = genreMapper.toEntity(dto);
-
-        genre.setId(null);
-        genre.setCreatedDate(new Date());
-        genre.setLastModifiedDate(new Date());
-
-        return genreMapper.toDto(genreService.saveGenre(genre));
-    }
-
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @PutMapping("{id}")
-    public GenreDto fullUpdateGenre(@PathVariable("id") Long genreId, @RequestBody GenreDto dto) {
-        try {
-            Genre genre = genreService.getById(genreId);
-
-            dto.setId(genre.getId());
-            dto.setCreatedDate(genre.getCreatedDate());
-            dto.setLastModifiedDate(new Date());
-
-            Genre genreByDto = genreMapper.toEntity(dto);
-            BeanUtils.copyProperties(genreByDto, genre);
-
-            return genreMapper.toDto(genreService.saveGenre(genre));
-        } catch (GenreException e) {
-            throw new NotFoundException(e.getMessage());
-        }
-    }
-
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @PatchMapping("{id}")
-    public GenreDto partUpdateGenre(@PathVariable("id") Long genreId, @RequestBody GenreDto dto) {
-        try {
-            Genre genre = genreService.getById(genreId);
-            Genre genreByDto = genreMapper.toEntity(dto);
-
-            if (genreByDto.getAuthors() != null)
-                genre.setAuthors(genreByDto.getAuthors());
-            if (genreByDto.getBooks() != null)
-                genre.setBooks(genreByDto.getBooks());
-            if (genreByDto.getGenre() != null)
-                genre.setGenre(genreByDto.getGenre());
-
-            genre.setLastModifiedDate(new Date());
-
-            return genreMapper.toDto(genreService.saveGenre(genre));
-        } catch (GenreException e) {
-            throw new NotFoundException(e.getMessage());
-        }
-    }
-
-
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @DeleteMapping("{id}")
-    public void deleteGenre(@PathVariable("id") Long genreId) {
-        try {
-            genreService.deleteById(genreId);
         } catch (GenreException e) {
             throw new NotFoundException(e.getMessage());
         }

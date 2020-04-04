@@ -9,7 +9,7 @@ import net.onlinelibrary.model.User;
 import java.util.List;
 
 public interface CommentService {
-    List<Comment> getByRange(Integer begin, Integer count);
+    List<Comment> getByRange(Integer offset, Integer count);
 
     Comment getById(Long commentId) throws CommentException;
 
@@ -17,7 +17,11 @@ public interface CommentService {
 
     User getUserOfComment(Long commentId) throws CommentException;
 
-    Comment saveComment(Comment comment) throws ValidationException;
+    Comment saveNewComment(Comment comment) throws ValidationException;
+
+    Comment updateComment(Long commentId, Comment comment) throws CommentException, ValidationException;
+
+    Comment updateCommentText(Long commentId, String text) throws CommentException, ValidationException;
 
     void deleteById(Long commentId) throws CommentException;
 }

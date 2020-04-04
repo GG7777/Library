@@ -50,7 +50,7 @@ public class JwtUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return user.isActive();
+        return user.getActive();
     }
 
     private List<GrantedAuthority> mapToGrantedAuthorities(Set<Role> userRoles) {

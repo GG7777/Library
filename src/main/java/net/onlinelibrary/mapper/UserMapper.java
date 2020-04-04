@@ -29,7 +29,7 @@ public class UserMapper implements Mapper<User, UserDto> {
         user.setCreatedDate(userDto.getCreatedDate());
         user.setLastModifiedDate(userDto.getLastModifiedDate());
 
-        user.setActive(userDto.isActive());
+        user.setActive(userDto.getActive());
         user.setEmail(userDto.getEmail());
         user.setPassword(userDto.getPassword());
         user.setUsername(userDto.getUsername());
@@ -57,7 +57,7 @@ public class UserMapper implements Mapper<User, UserDto> {
         dto.setCreatedDate(user.getCreatedDate());
         dto.setLastModifiedDate(user.getLastModifiedDate());
 
-        dto.setActive(user.isActive());
+        dto.setActive(user.getActive());
         dto.setEmail(user.getEmail());
         dto.setPassword(user.getPassword());
         dto.setUsername(user.getUsername());

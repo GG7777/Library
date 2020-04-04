@@ -20,7 +20,7 @@ public class User extends BaseEntity {
     private String password;
 
     @Column(name = "active")
-    private boolean active;
+    private Boolean active;
 
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))

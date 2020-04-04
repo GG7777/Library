@@ -1,22 +1,20 @@
 package net.onlinelibrary.rest;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import net.onlinelibrary.dto.AuthorDto;
 import net.onlinelibrary.dto.BookDto;
 import net.onlinelibrary.dto.CommentDto;
 import net.onlinelibrary.dto.GenreDto;
+import net.onlinelibrary.dto.view.Views;
 import net.onlinelibrary.exception.BookException;
 import net.onlinelibrary.exception.withResponseStatus.NotFoundException;
 import net.onlinelibrary.mapper.AuthorMapper;
 import net.onlinelibrary.mapper.BookMapper;
 import net.onlinelibrary.mapper.CommentMapper;
 import net.onlinelibrary.mapper.GenreMapper;
-import net.onlinelibrary.model.Book;
 import net.onlinelibrary.service.BookService;
-import org.springframework.beans.BeanUtils;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 import java.util.stream.Stream;
 
 @RestController
@@ -43,14 +41,16 @@ public class BookController {
     }
 
     @GetMapping("")
-    public Stream<BookDto> getBooksInRange(@RequestParam Integer begin, @RequestParam Integer count) {
+    @JsonView(Views.ForEvery.class)
+    public Stream<BookDto> getBooksInRange(@RequestParam Integer offset, @RequestParam Integer count) {
         return bookService
-                .getByRange(begin, count)
+                .getByRange(offset, count)
                 .stream()
                 .map(book -> bookMapper.toDto(book));
     }
 
     @GetMapping("{id}")
+    @JsonView(Views.ForEvery.class)
     public BookDto getBookById(@PathVariable("id") Long bookId) {
         try {
             return bookMapper.toDto(bookService.getById(bookId));
@@ -60,6 +60,7 @@ public class BookController {
     }
 
     @GetMapping("{id}/authors")
+    @JsonView(Views.ForEvery.class)
     public Stream<AuthorDto> getAuthorsOfBook(@PathVariable("id") Long bookId) {
         try {
             return bookService
@@ -72,6 +73,7 @@ public class BookController {
     }
 
     @GetMapping("{id}/genres")
+    @JsonView(Views.ForEvery.class)
     public Stream<GenreDto> getGenresOfBook(@PathVariable("id") Long bookId) {
         try {
             return bookService
@@ -84,93 +86,13 @@ public class BookController {
     }
 
     @GetMapping("{id}/comments")
+    @JsonView(Views.ForEvery.class)
     public Stream<CommentDto> getCommentsOfBook(@PathVariable("id") Long bookId) {
         try {
             return bookService
                     .getCommentsOfBook(bookId)
                     .stream()
                     .map(comment -> commentMapper.toDto(comment));
-        } catch (BookException e) {
-            throw new NotFoundException(e.getMessage());
-        }
-    }
-
-
-
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @PostMapping("")
-    public BookDto saveBook(@RequestBody BookDto dto) {
-        Book book = bookMapper.toEntity(dto);
-
-        book.setId(null);
-        book.setCreatedDate(new Date());
-        book.setLastModifiedDate(new Date());
-
-        book.setRating(0);
-
-        return bookMapper.toDto(bookService.saveBook(book));
-    }
-
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @PutMapping("{id}")
-    public BookDto fullUpdateBook(@PathVariable("id") Long bookId, @RequestBody BookDto dto) {
-        try {
-            Book book = bookService.getById(bookId);
-            Book bookByDto = bookMapper.toEntity(dto);
-
-            bookByDto.setId(book.getId());
-            bookByDto.setCreatedDate(book.getCreatedDate());
-            bookByDto.setLastModifiedDate(new Date());
-
-            BeanUtils.copyProperties(bookByDto, book);
-
-            return bookMapper.toDto(bookService.saveBook(book));
-        } catch (BookException e) {
-            throw new NotFoundException(e.getMessage());
-        }
-    }
-
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @PatchMapping("{id}")
-    public BookDto partUpdateBook(@PathVariable("id") Long bookId, @RequestBody BookDto dto) {
-        try {
-            Book book = bookService.getById(bookId);
-            Book bookByDto = bookMapper.toEntity(dto);
-
-            if (bookByDto.getAuthors() != null)
-                book.setAuthors(bookByDto.getAuthors());
-            if (bookByDto.getGenres() != null)
-                book.setGenres(bookByDto.getGenres());
-            if (bookByDto.getComments() != null)
-                book.setComments(bookByDto.getComments());
-            if (bookByDto.getAvatar() != null)
-                book.setAvatar(bookByDto.getAvatar());
-            if (bookByDto.getName() != null)
-                book.setName(bookByDto.getName());
-            if (bookByDto.getPagesCount() != null)
-                book.setPagesCount(bookByDto.getPagesCount());
-            if (bookByDto.getPublicationYear() != null)
-                book.setPublicationYear(bookByDto.getPublicationYear());
-            if (bookByDto.getRating() != null)
-                book.setRating(bookByDto.getRating());
-            if (bookByDto.getShortDescription() != null)
-                book.setShortDescription(bookByDto.getShortDescription());
-
-            book.setLastModifiedDate(new Date());
-
-            return bookMapper.toDto(bookService.saveBook(book));
-        } catch (BookException e) {
-            throw new NotFoundException(e.getMessage());
-        }
-    }
-
-
-
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @DeleteMapping("{id}")
-    public void deleteBook(@PathVariable("id") Long bookId) {
-        try {
-            bookService.deleteById(bookId);
         } catch (BookException e) {
             throw new NotFoundException(e.getMessage());
         }

@@ -2,6 +2,7 @@ package net.onlinelibrary.model;
 
 public enum Role {
     USER,
+    MODERATOR,
     ADMIN,
-    KOSTYAN
+    SUPER_ADMIN
 }
