@@ -8,6 +8,7 @@ import net.onlinelibrary.model.Book;
 import net.onlinelibrary.model.Genre;
 import net.onlinelibrary.repository.AuthorRepository;
 import net.onlinelibrary.service.AuthorService;
+import net.onlinelibrary.substitute.implementation.AuthorPropertiesSubstitute;
 import net.onlinelibrary.util.NumberNormalizer;
 import net.onlinelibrary.validator.implementation.AuthorValidator;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -24,10 +25,15 @@ import java.util.Optional;
 public class AuthorServiceImpl implements AuthorService {
     private final AuthorRepository authorRepo;
     private final AuthorValidator authorValidator;
+    private final AuthorPropertiesSubstitute authorPropsSubstitute;
 
-    public AuthorServiceImpl(AuthorRepository authorRepo, AuthorValidator authorValidator) {
+    public AuthorServiceImpl(
+            AuthorRepository authorRepo,
+            AuthorValidator authorValidator,
+            AuthorPropertiesSubstitute authorPropsSubstitute) {
         this.authorRepo = authorRepo;
         this.authorValidator = authorValidator;
+        this.authorPropsSubstitute = authorPropsSubstitute;
     }
 
     @Override
@@ -87,6 +93,8 @@ public class AuthorServiceImpl implements AuthorService {
         author.setId(null);
         author.setCreatedDate(new Date());
         author.setLastModifiedDate(new Date());
+
+        author = authorPropsSubstitute.substitute(author);
 
         try {
             authorValidator.validate(author);

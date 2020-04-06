@@ -7,14 +7,13 @@ import net.onlinelibrary.dto.GenreDto;
 import net.onlinelibrary.dto.view.Views;
 import net.onlinelibrary.exception.AuthorException;
 import net.onlinelibrary.exception.withResponseStatus.NotFoundException;
-import net.onlinelibrary.mapper.AuthorMapper;
-import net.onlinelibrary.mapper.BookMapper;
-import net.onlinelibrary.mapper.GenreMapper;
+import net.onlinelibrary.mapper.implementation.AuthorMapper;
+import net.onlinelibrary.mapper.implementation.BookMapper;
+import net.onlinelibrary.mapper.implementation.GenreMapper;
 import net.onlinelibrary.model.Author;
 import net.onlinelibrary.service.AuthorService;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.text.View;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;

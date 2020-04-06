@@ -11,7 +11,7 @@ import net.onlinelibrary.exception.ValidationException;
 import net.onlinelibrary.exception.withResponseStatus.BadRequestException;
 import net.onlinelibrary.exception.withResponseStatus.ForbiddenException;
 import net.onlinelibrary.exception.withResponseStatus.NotFoundException;
-import net.onlinelibrary.mapper.CommentMapper;
+import net.onlinelibrary.mapper.implementation.CommentMapper;
 import net.onlinelibrary.model.Comment;
 import net.onlinelibrary.model.User;
 import net.onlinelibrary.rest.CommentController;
@@ -79,9 +79,9 @@ public class UserCommentController {
     @PostMapping("")
     @JsonView(Views.ForUser.class)
     public CommentDto saveComment(@RequestBody CommentDto dto) {
+        checkAccessRightsToAddComment(dto.getUser());
+
         Comment comment = commentMapper.toEntity(dto);
-        comment.setRating(0l);
-        comment.setUser(getAuthorizedUser());
         try {
             Comment savedComment = commentService.saveNewComment(comment);
             return commentMapper.toDto(savedComment);
@@ -93,11 +93,7 @@ public class UserCommentController {
     @PatchMapping("{id}/text")
     @JsonView(Views.ForUser.class)
     public CommentDto updateCommentText(@PathVariable("id") Long commentId, @RequestBody CommentDto dto) {
-        if (dto.getText() == null)
-            throw new BadRequestException("Text can not be null");
-
         checkAccessRightsToModifyComment(commentId);
-
         try {
             Comment updatedComment = commentService.updateCommentText(commentId, dto.getText());
             return commentMapper.toDto(updatedComment);
@@ -120,12 +116,6 @@ public class UserCommentController {
     }
 
     private void checkAccessRightsToModifyComment(Long commentId) {
-        String authorizedUsername = ((UserDetails) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal())
-                .getUsername();
-
         User userWithComment;
         try {
             userWithComment = commentService.getUserOfComment(commentId);
@@ -133,15 +123,17 @@ public class UserCommentController {
             throw new NotFoundException(e.getMessage());
         }
 
-        User authorizedUser = null;
-        try {
-            authorizedUser = userService.getByUsername(authorizedUsername);
-        } catch (UserNotFoundException e) {
-            throw new NotFoundException(e.getMessage());
-        }
+        User authorizedUser = getAuthorizedUser();
 
         if (!authorizedUser.getId().equals(userWithComment.getId()))
-            throw new ForbiddenException("You do not have access to change authorizedUser");
+            throw new ForbiddenException("You do not have access to change comment");
+    }
+
+    private void checkAccessRightsToAddComment(Long userId) {
+        User authorizedUser = getAuthorizedUser();
+
+        if (!authorizedUser.getId().equals(userId))
+            throw new ForbiddenException("You must add comment from yourself");
     }
 
     private User getAuthorizedUser() {

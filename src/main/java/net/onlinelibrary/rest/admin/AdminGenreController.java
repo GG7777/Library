@@ -9,7 +9,7 @@ import net.onlinelibrary.exception.GenreException;
 import net.onlinelibrary.exception.ValidationException;
 import net.onlinelibrary.exception.withResponseStatus.BadRequestException;
 import net.onlinelibrary.exception.withResponseStatus.NotFoundException;
-import net.onlinelibrary.mapper.GenreMapper;
+import net.onlinelibrary.mapper.implementation.GenreMapper;
 import net.onlinelibrary.model.Genre;
 import net.onlinelibrary.rest.GenreController;
 import net.onlinelibrary.service.GenreService;
@@ -68,9 +68,9 @@ public class AdminGenreController {
     }
 
     @GetMapping("search")
-    @JsonView(Views.ForEvery.class)
-    public Stream<GenreDto> search(@RequestParam String startsWith) {
-        return genreController.search(startsWith);
+    @JsonView(Views.ForAdmin.class)
+    public Stream<GenreDto> searchBy(@RequestParam("name") String genreStartsWith) {
+        return genreController.searchBy(genreStartsWith);
     }
 
     @PostMapping("")

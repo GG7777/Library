@@ -13,7 +13,6 @@ public class CommentValidator implements Validator<Comment> {
     public void validate(@NotNull Comment comment) throws ValidationException {
         validatePropertiesOnNullOrEmpty(comment);
         validateText(comment.getText());
-        validateRating(comment.getRating());
     }
 
     private void validatePropertiesOnNullOrEmpty(Comment comment) throws ValidationException {
@@ -30,10 +29,5 @@ public class CommentValidator implements Validator<Comment> {
     private void validateText(String text) throws ValidationException {
         if (text.length() > 500)
             throw new ValidationException("comment text length must be less or equal to 500");
-    }
-
-    private void validateRating(Long rating) throws ValidationException {
-        if (rating < 0)
-            throw new ValidationException("rating must be not negative number");
     }
 }

@@ -8,10 +8,10 @@ import net.onlinelibrary.dto.GenreDto;
 import net.onlinelibrary.dto.view.Views;
 import net.onlinelibrary.exception.BookException;
 import net.onlinelibrary.exception.withResponseStatus.NotFoundException;
-import net.onlinelibrary.mapper.AuthorMapper;
-import net.onlinelibrary.mapper.BookMapper;
-import net.onlinelibrary.mapper.CommentMapper;
-import net.onlinelibrary.mapper.GenreMapper;
+import net.onlinelibrary.mapper.implementation.AuthorMapper;
+import net.onlinelibrary.mapper.implementation.BookMapper;
+import net.onlinelibrary.mapper.implementation.CommentMapper;
+import net.onlinelibrary.mapper.implementation.GenreMapper;
 import net.onlinelibrary.service.BookService;
 import org.springframework.web.bind.annotation.*;
 
