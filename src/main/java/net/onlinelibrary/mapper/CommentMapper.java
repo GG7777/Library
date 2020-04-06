@@ -1,7 +1,6 @@
-package net.onlinelibrary.mapper.implementation;
+package net.onlinelibrary.mapper;
 
 import net.onlinelibrary.dto.CommentDto;
-import net.onlinelibrary.mapper.Mapper;
 import net.onlinelibrary.model.Comment;
 import net.onlinelibrary.repository.BookRepository;
 import net.onlinelibrary.repository.UserRepository;
@@ -9,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CommentMapper implements Mapper<Comment, CommentDto> {
+
     private final UserRepository userRepo;
     private final BookRepository bookRepo;
 

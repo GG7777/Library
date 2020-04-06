@@ -8,7 +8,6 @@ import net.onlinelibrary.model.Book;
 import net.onlinelibrary.model.Genre;
 import net.onlinelibrary.repository.GenreRepository;
 import net.onlinelibrary.service.GenreService;
-import net.onlinelibrary.substitute.implementation.GenrePropertiesSubstitute;
 import net.onlinelibrary.util.NumberNormalizer;
 import net.onlinelibrary.validator.implementation.GenreValidator;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -24,15 +23,10 @@ import java.util.Optional;
 public class GenreServiceImpl implements GenreService {
     private final GenreRepository genreRepo;
     private final GenreValidator genreValidator;
-    private final GenrePropertiesSubstitute genrePropsSubstitute;
 
-    public GenreServiceImpl(
-            GenreRepository genreRepo,
-            GenreValidator genreValidator,
-            GenrePropertiesSubstitute genrePropsSubstitute) {
+    public GenreServiceImpl(GenreRepository genreRepo, GenreValidator genreValidator) {
         this.genreRepo = genreRepo;
         this.genreValidator = genreValidator;
-        this.genrePropsSubstitute = genrePropsSubstitute;
     }
 
     @Override
@@ -92,8 +86,6 @@ public class GenreServiceImpl implements GenreService {
         genre.setId(null);
         genre.setCreatedDate(new Date());
         genre.setLastModifiedDate(new Date());
-
-        genre = genrePropsSubstitute.substitute(genre);
 
         try {
             genreValidator.validate(genre);

@@ -10,7 +10,7 @@ import net.onlinelibrary.exception.BookException;
 import net.onlinelibrary.exception.ValidationException;
 import net.onlinelibrary.exception.withResponseStatus.BadRequestException;
 import net.onlinelibrary.exception.withResponseStatus.NotFoundException;
-import net.onlinelibrary.mapper.implementation.BookMapper;
+import net.onlinelibrary.mapper.BookMapper;
 import net.onlinelibrary.model.Book;
 import net.onlinelibrary.rest.BookController;
 import net.onlinelibrary.service.BookService;

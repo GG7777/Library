@@ -3,11 +3,12 @@ package net.onlinelibrary.rest;
 import com.fasterxml.jackson.annotation.JsonView;
 import net.onlinelibrary.dto.UserDto;
 import net.onlinelibrary.dto.view.Views;
-import net.onlinelibrary.exception.UserNotFoundException;
 import net.onlinelibrary.exception.ValidationException;
 import net.onlinelibrary.exception.withResponseStatus.BadRequestException;
 import net.onlinelibrary.exception.withResponseStatus.NotFoundException;
-import net.onlinelibrary.mapper.implementation.UserMapper;
+import net.onlinelibrary.exception.UserNotFoundException;
+import net.onlinelibrary.mapper.UserMapper;
+import net.onlinelibrary.model.Role;
 import net.onlinelibrary.model.User;
 import net.onlinelibrary.security.jwt.JwtTokenProvider;
 import net.onlinelibrary.service.UserService;
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -65,7 +68,7 @@ public class AuthenticationController {
         String token = jwtTokenProvider.createToken(user.getUsername(), user.getRoles());
 
         Map<Object, Object> response = new HashMap<>();
-        response.put("user", userMapper.toDto(user));
+        response.put("username", user.getUsername());
         response.put("token", token);
 
         return response;
@@ -73,8 +76,13 @@ public class AuthenticationController {
 
     @PostMapping("register")
     @JsonView(Views.ForEvery.class)
-    public UserDto register(@RequestBody UserDto dto) {
+    public Map<Object, Object> register(@RequestBody UserDto dto) {
         User user = userMapper.toEntity(dto);
+        user.setActive(true);
+        user.setRoles(Collections.singleton(Role.USER));
+        user.setComments(user.getComments() != null
+                ? user.getComments()
+                : new ArrayList<>());
 
         User savedUser;
         try {
@@ -83,6 +91,21 @@ public class AuthenticationController {
             throw new BadRequestException("Validation failure - " + e.getMessage());
         }
 
-        return userMapper.toDto(savedUser);
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            user.getUsername(),
+                            user.getPassword()));
+        } catch (AuthenticationException e) {
+            throw new BadCredentialsException("Invalid username or password");
+        }
+
+        String token = jwtTokenProvider.createToken(savedUser.getUsername(), savedUser.getRoles());
+
+        Map<Object, Object> response = new HashMap<>();
+        response.put("username", savedUser.getUsername());
+        response.put("token", token);
+
+        return response;
     }
 }

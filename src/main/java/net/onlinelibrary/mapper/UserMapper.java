@@ -1,7 +1,6 @@
-package net.onlinelibrary.mapper.implementation;
+package net.onlinelibrary.mapper;
 
 import net.onlinelibrary.dto.UserDto;
-import net.onlinelibrary.mapper.Mapper;
 import net.onlinelibrary.model.Comment;
 import net.onlinelibrary.model.Role;
 import net.onlinelibrary.model.User;
@@ -15,6 +14,7 @@ import java.util.stream.Collectors;
 
 @Component
 public class UserMapper implements Mapper<User, UserDto> {
+
     private final CommentRepository commentRepo;
 
     public UserMapper(CommentRepository commentRepo) {

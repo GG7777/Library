@@ -8,7 +8,6 @@ import net.onlinelibrary.model.Role;
 import net.onlinelibrary.model.User;
 import net.onlinelibrary.repository.UserRepository;
 import net.onlinelibrary.service.UserService;
-import net.onlinelibrary.substitute.implementation.UserPropertiesSubstitute;
 import net.onlinelibrary.util.NumberNormalizer;
 import net.onlinelibrary.validator.implementation.UserValidator;
 import org.springframework.context.annotation.Lazy;
@@ -28,17 +27,11 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepo;
     private final UserValidator userValidator;
     private final PasswordEncoder passwordEncoder;
-    private final UserPropertiesSubstitute userPropsSubstitute;
 
-    public UserServiceImpl(
-            UserRepository userRepo,
-            UserValidator userValidator,
-            @Lazy PasswordEncoder passwordEncoder,
-            UserPropertiesSubstitute userPropsSubstitute) {
+    public UserServiceImpl(UserRepository userRepo, UserValidator userValidator, @Lazy PasswordEncoder passwordEncoder) {
         this.userRepo = userRepo;
         this.userValidator = userValidator;
         this.passwordEncoder = passwordEncoder;
-        this.userPropsSubstitute = userPropsSubstitute;
     }
 
     @Override
@@ -119,8 +112,6 @@ public class UserServiceImpl implements UserService {
         user.setCreatedDate(new Date());
         user.setLastModifiedDate(new Date());
 
-        user = userPropsSubstitute.substitute(user);
-
         try {
             userValidator.validate(user);
         } catch (ValidationException e) {
@@ -166,7 +157,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updatePassword(@NotNull Long userId, String newPassword) throws UserNotFoundException, ValidationException {
+    public User updatePassword(@NotNull Long userId, @NotNull String newPassword) throws UserNotFoundException, ValidationException {
         User userFromRepo;
         try {
             userFromRepo = getById(userId);
@@ -193,7 +184,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateUsername(@NotNull Long userId, String newUsername) throws UserNotFoundException, ValidationException {
+    public User updateUsername(@NotNull Long userId, @NotNull String newUsername) throws UserNotFoundException, ValidationException {
         User userFromRepo;
         try {
             userFromRepo = getById(userId);
@@ -218,7 +209,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateEmail(@NotNull Long userId, String newEmail) throws UserNotFoundException, ValidationException {
+    public User updateEmail(@NotNull Long userId, @NotNull String newEmail) throws UserNotFoundException, ValidationException {
         User userFromRepo;
         try {
             userFromRepo = getById(userId);

@@ -8,7 +8,7 @@ import net.onlinelibrary.exception.UserNotFoundException;
 import net.onlinelibrary.exception.ValidationException;
 import net.onlinelibrary.exception.withResponseStatus.BadRequestException;
 import net.onlinelibrary.exception.withResponseStatus.NotFoundException;
-import net.onlinelibrary.mapper.implementation.UserMapper;
+import net.onlinelibrary.mapper.UserMapper;
 import net.onlinelibrary.model.Role;
 import net.onlinelibrary.model.User;
 import net.onlinelibrary.rest.UserController;
@@ -129,6 +129,8 @@ public class SuperAdminUserController {
     @PatchMapping("{id}/password")
     @JsonView(Views.ForSuperAdmin.class)
     public UserDto updatePassword(@PathVariable("id") Long userId, @RequestBody UserDto dto) {
+        if (dto.getPassword() == null)
+            throw new BadRequestException("Password can not be null");
         try {
             User updatedUser = userService.updatePassword(userId, dto.getPassword());
             return userMapper.toDto(updatedUser);
@@ -140,8 +142,10 @@ public class SuperAdminUserController {
     }
 
     @PatchMapping("{id}/username")
-    @JsonView(Views.ForSuperAdmin.class)
+    @JsonView(Views.ForUser.class)
     public UserDto updateUsername(@PathVariable("id") Long userId, @RequestBody UserDto dto) {
+        if (dto.getUsername() == null)
+            throw new BadRequestException("Username can not be null");
         try {
             User updatedUser = userService.updateUsername(userId, dto.getUsername());
             return userMapper.toDto(updatedUser);
@@ -153,8 +157,10 @@ public class SuperAdminUserController {
     }
 
     @PatchMapping("{id}/email")
-    @JsonView(Views.ForSuperAdmin.class)
+    @JsonView(Views.ForUser.class)
     public UserDto updateEmail(@PathVariable("id") Long userId, @RequestBody UserDto dto) {
+        if (dto.getEmail() == null)
+            throw new BadRequestException("Email can not be null");
         try {
             User updatedUser = userService.updateEmail(userId, dto.getEmail());
             return userMapper.toDto(updatedUser);

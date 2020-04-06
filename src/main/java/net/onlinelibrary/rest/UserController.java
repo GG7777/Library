@@ -6,8 +6,8 @@ import net.onlinelibrary.dto.UserDto;
 import net.onlinelibrary.dto.view.Views;
 import net.onlinelibrary.exception.UserNotFoundException;
 import net.onlinelibrary.exception.withResponseStatus.NotFoundException;
-import net.onlinelibrary.mapper.implementation.CommentMapper;
-import net.onlinelibrary.mapper.implementation.UserMapper;
+import net.onlinelibrary.mapper.CommentMapper;
+import net.onlinelibrary.mapper.UserMapper;
 import net.onlinelibrary.service.UserService;
 import org.springframework.web.bind.annotation.*;
 

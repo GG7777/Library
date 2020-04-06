@@ -25,7 +25,7 @@ public class Book extends BaseEntity {
     private String shortDescription;
 
     @Column(name = "rating")
-    private Long rating;
+    private Integer rating;
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Author> authors;
