@@ -17,6 +17,7 @@ import net.onlinelibrary.service.BookService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.stream.Stream;
 
 @RestController
@@ -65,6 +66,12 @@ public class AdminBookController {
     @JsonView(Views.ForAdmin.class)
     public Stream<CommentDto> getCommentsOfBook(@PathVariable("id") Long bookId) {
         return bookController.getCommentsOfBook(bookId);
+    }
+
+    @GetMapping("count")
+    @JsonView(Views.ForAdmin.class)
+    public Map<Object, Object> getTotalBooksCount() {
+        return bookController.getTotalBooksCount();
     }
 
     @PostMapping("")

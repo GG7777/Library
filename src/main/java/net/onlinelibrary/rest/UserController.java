@@ -8,11 +8,11 @@ import net.onlinelibrary.exception.UserNotFoundException;
 import net.onlinelibrary.exception.withResponseStatus.NotFoundException;
 import net.onlinelibrary.mapper.CommentMapper;
 import net.onlinelibrary.mapper.UserMapper;
-import net.onlinelibrary.model.Role;
 import net.onlinelibrary.service.UserService;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Stream;
 
 @RestController
@@ -61,13 +61,15 @@ public class UserController {
         }
     }
 
-    @GetMapping("{id}/roles")
+    @GetMapping("count")
     @JsonView(Views.ForEvery.class)
-    public Set<Role> getRolesOfUser(@PathVariable("id") Long userId) {
-        try {
-            return userService.getRolesOfUser(userId);
-        } catch (UserNotFoundException e) {
-            throw new NotFoundException(e.getMessage());
-        }
+    public Map<Object, Object> getTotalUsersCount() {
+        Long count = userService.getUsersCount();
+
+        HashMap<Object, Object> map = new HashMap<>();
+
+        map.put("count", count);
+
+        return map;
     }
 }

@@ -16,6 +16,7 @@ import net.onlinelibrary.service.CommentService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.stream.Stream;
 
 @RestController
@@ -58,6 +59,12 @@ public class ModeratorCommentController {
     @JsonView(Views.ForModerator.class)
     public UserDto getUserOfComment(@PathVariable("id") Long commentId) {
         return commentController.getUserOfComment(commentId);
+    }
+
+    @GetMapping("count")
+    @JsonView(Views.ForModerator.class)
+    public Map<Object, Object> getTotalCommentsCount() {
+        return commentController.getTotalCommentsCount();
     }
 
     @PostMapping("")

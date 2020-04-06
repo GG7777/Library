@@ -1,7 +1,7 @@
 package net.onlinelibrary.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Data;
 import net.onlinelibrary.dto.view.Views;
@@ -18,7 +18,7 @@ public class UserDto extends BaseDto {
     @JsonView(Views.ForSuperAdmin.class)
     private String email;
 
-    @JsonView(Views.ForSuperAdmin.class)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @JsonView(Views.ForSuperAdmin.class)
@@ -27,7 +27,7 @@ public class UserDto extends BaseDto {
     @JsonView(Views.ForSuperAdmin.class)
     private Set<String> roles;
 
-    @JsonView(Views.ForUser.class)
+    @JsonView(Views.ForSuperAdmin.class)
     private List<Long> comments;
 
 

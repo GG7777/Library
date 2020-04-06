@@ -14,6 +14,8 @@ import net.onlinelibrary.model.Author;
 import net.onlinelibrary.service.AuthorService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Stream;
 
 @RestController
@@ -80,5 +82,17 @@ public class AuthorController {
         } catch (AuthorException e) {
             throw new NotFoundException(e.getMessage());
         }
+    }
+
+    @GetMapping("count")
+    @JsonView(Views.ForEvery.class)
+    public Map<Object, Object> getTotalAuthorsCount() {
+        Long count = authorService.getAuthorsCount();
+
+        HashMap<Object, Object> map = new HashMap<>();
+
+        map.put("count", count);
+
+        return map;
     }
 }

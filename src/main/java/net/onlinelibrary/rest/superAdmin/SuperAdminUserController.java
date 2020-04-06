@@ -16,6 +16,7 @@ import net.onlinelibrary.service.UserService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -58,7 +59,17 @@ public class SuperAdminUserController {
     @GetMapping("{id}/roles")
     @JsonView(Views.ForSuperAdmin.class)
     public Set<Role> getRolesOfUser(@PathVariable("id") Long userId) {
-        return userController.getRolesOfUser(userId);
+        try {
+            return userService.getRolesOfUser(userId);
+        } catch (UserNotFoundException e) {
+            throw new NotFoundException(e.getMessage());
+        }
+    }
+
+    @GetMapping("count")
+    @JsonView(Views.ForSuperAdmin.class)
+    public Map<Object, Object> getTotalUsersCount() {
+        return userController.getTotalUsersCount();
     }
 
     @PostMapping("")

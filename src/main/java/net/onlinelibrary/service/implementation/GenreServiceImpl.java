@@ -138,4 +138,9 @@ public class GenreServiceImpl implements GenreService {
             throw genreException;
         }
     }
+
+    @Override
+    public Long getGenresCount() {
+        return genreRepo.count();
+    }
 }

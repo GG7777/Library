@@ -13,6 +13,8 @@ import net.onlinelibrary.mapper.GenreMapper;
 import net.onlinelibrary.service.GenreService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Stream;
 
 @RestController
@@ -78,5 +80,17 @@ public class GenreController {
         } catch (GenreException e) {
             throw new NotFoundException(e.getMessage());
         }
+    }
+
+    @GetMapping("count")
+    @JsonView(Views.ForEvery.class)
+    public Map<Object, Object> getTotalGenresCount() {
+        Long count = genreService.getGenresCount();
+
+        HashMap<Object, Object> map = new HashMap<>();
+
+        map.put("count", count);
+
+        return map;
     }
 }

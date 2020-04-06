@@ -24,4 +24,6 @@ public interface CommentService {
     Comment updateCommentText(Long commentId, String text) throws CommentException, ValidationException;
 
     void deleteById(Long commentId) throws CommentException;
+
+    Long getCommentsCount();
 }

@@ -22,4 +22,6 @@ public interface GenreService {
     Genre updateGenre(Long genreId, Genre genre) throws GenreException, ValidationException;
 
     void deleteById(Long genreId) throws GenreException;
+
+    Long getGenresCount();
 }

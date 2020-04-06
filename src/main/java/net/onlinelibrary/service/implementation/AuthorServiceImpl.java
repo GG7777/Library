@@ -136,4 +136,9 @@ public class AuthorServiceImpl implements AuthorService {
             throw authorException;
         }
     }
+
+    @Override
+    public Long getAuthorsCount() {
+        return authorRepo.count();
+    }
 }

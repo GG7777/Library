@@ -22,6 +22,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.stream.Stream;
 
 @RestController
@@ -67,6 +68,12 @@ public class UserCommentController {
     @JsonView(Views.ForUser.class)
     public UserDto getUserOfComment(@PathVariable("id") Long commentId) {
         return commentController.getUserOfComment(commentId);
+    }
+
+    @GetMapping("count")
+    @JsonView(Views.ForUser.class)
+    public Map<Object, Object> getTotalCommentsCount() {
+        return commentController.getTotalCommentsCount();
     }
 
     @PostMapping("")

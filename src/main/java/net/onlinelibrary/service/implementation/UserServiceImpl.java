@@ -74,6 +74,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Long getUsersCount() {
+        return userRepo.count();
+    }
+
+    @Override
     public List<Comment> getCommentsOfUser(@NotNull Long userId) throws UserNotFoundException {
         Optional<User> userOpt = userRepo.findById(userId);
         if(!userOpt.isPresent()) {

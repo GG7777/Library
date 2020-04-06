@@ -22,4 +22,6 @@ public interface AuthorService {
     Author updateAuthor(Long authorId, Author author) throws AuthorException, ValidationException;
 
     void deleteById(Long authorId) throws AuthorException;
+
+    Long getAuthorsCount();
 }

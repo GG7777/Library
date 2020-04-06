@@ -161,4 +161,9 @@ public class CommentServiceImpl implements CommentService {
             throw commentException;
         }
     }
+
+    @Override
+    public Long getCommentsCount() {
+        return commentRepo.count();
+    }
 }

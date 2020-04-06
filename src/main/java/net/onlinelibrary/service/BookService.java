@@ -26,4 +26,6 @@ public interface BookService {
     Book updateBook(Long bookId, Book book) throws BookException, ValidationException;
 
     void deleteById(Long bookId) throws BookException;
+
+    Long getBooksCount();
 }

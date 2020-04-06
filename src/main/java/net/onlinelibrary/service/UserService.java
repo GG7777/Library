@@ -31,4 +31,6 @@ public interface UserService {
     void deleteById(Long userId) throws UserNotFoundException;
 
     User getByUsername(String username) throws UserNotFoundException;
+
+    Long getUsersCount();
 }

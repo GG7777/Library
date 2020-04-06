@@ -13,6 +13,8 @@ import net.onlinelibrary.mapper.UserMapper;
 import net.onlinelibrary.service.CommentService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Stream;
 
 @RestController
@@ -72,5 +74,17 @@ public class CommentController {
         } catch (CommentException e) {
             throw new NotFoundException(e.getMessage());
         }
+    }
+
+    @GetMapping("count")
+    @JsonView(Views.ForEvery.class)
+    public Map<Object, Object> getTotalCommentsCount() {
+        Long count = commentService.getCommentsCount();
+
+        HashMap<Object, Object> map = new HashMap<>();
+
+        map.put("count", count);
+
+        return map;
     }
 }

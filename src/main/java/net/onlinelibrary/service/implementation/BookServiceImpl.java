@@ -150,4 +150,9 @@ public class BookServiceImpl implements BookService {
             throw bookException;
         }
     }
+
+    @Override
+    public Long getBooksCount() {
+        return bookRepo.count();
+    }
 }

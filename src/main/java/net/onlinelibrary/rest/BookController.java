@@ -15,7 +15,9 @@ import net.onlinelibrary.mapper.GenreMapper;
 import net.onlinelibrary.service.BookService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.stream.Stream;
+import java.util.Map;
 
 @RestController
 @RequestMapping("api/books")
@@ -96,5 +98,17 @@ public class BookController {
         } catch (BookException e) {
             throw new NotFoundException(e.getMessage());
         }
+    }
+
+    @GetMapping("count")
+    @JsonView(Views.ForEvery.class)
+    public Map<Object, Object> getTotalBooksCount() {
+        Long count = bookService.getBooksCount();
+
+        HashMap<Object, Object> map = new HashMap<>();
+
+        map.put("count", count);
+
+        return map;
     }
 }

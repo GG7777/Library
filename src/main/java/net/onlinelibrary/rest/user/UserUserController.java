@@ -10,7 +10,6 @@ import net.onlinelibrary.exception.withResponseStatus.BadRequestException;
 import net.onlinelibrary.exception.withResponseStatus.ForbiddenException;
 import net.onlinelibrary.exception.withResponseStatus.NotFoundException;
 import net.onlinelibrary.mapper.UserMapper;
-import net.onlinelibrary.model.Role;
 import net.onlinelibrary.model.User;
 import net.onlinelibrary.rest.UserController;
 import net.onlinelibrary.service.UserService;
@@ -19,7 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Set;
+import java.util.Map;
 import java.util.stream.Stream;
 
 @RestController
@@ -58,10 +57,10 @@ public class UserUserController {
         return userController.getCommentsOfUser(userId);
     }
 
-    @GetMapping("{id}/roles")
+    @GetMapping("count")
     @JsonView(Views.ForUser.class)
-    public Set<Role> getRolesOfUser(@PathVariable("id") Long userId) {
-        return userController.getRolesOfUser(userId);
+    public Map<Object, Object> getTotalUsersCount() {
+        return userController.getTotalUsersCount();
     }
 
     @PatchMapping("{id}/password")

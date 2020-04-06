@@ -16,6 +16,7 @@ import net.onlinelibrary.service.AuthorService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.stream.Stream;
 
 @RestController
@@ -58,6 +59,12 @@ public class AdminAuthorController {
     @JsonView(Views.ForAdmin.class)
     public Stream<GenreDto> getGenresOfAuthor(@PathVariable("id") Long authorId) {
         return authorController.getGenresOfAuthor(authorId);
+    }
+
+    @GetMapping("count")
+    @JsonView(Views.ForAdmin.class)
+    public Map<Object, Object> getTotalAuthorsCount() {
+        return authorController.getTotalAuthorsCount();
     }
 
     @PostMapping("")
