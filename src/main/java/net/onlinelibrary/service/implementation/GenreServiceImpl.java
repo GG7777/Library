@@ -141,6 +141,8 @@ public class GenreServiceImpl implements GenreService {
 
     @Override
     public Long getGenresCount() {
-        return genreRepo.count();
+        long count = genreRepo.count();
+        log.info("IN getGenresCount - total genres count = " + count);
+        return count;
     }
 }

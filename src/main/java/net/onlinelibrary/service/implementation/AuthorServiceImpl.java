@@ -139,6 +139,8 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public Long getAuthorsCount() {
-        return authorRepo.count();
+        long count = authorRepo.count();
+        log.info("IN getAuthorsCount - total authors count = " + count);
+        return count;
     }
 }

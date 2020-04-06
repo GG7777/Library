@@ -153,6 +153,8 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Long getBooksCount() {
-        return bookRepo.count();
+        long count = bookRepo.count();
+        log.info("IN getBooksCount - total books count = " + count);
+        return count;
     }
 }

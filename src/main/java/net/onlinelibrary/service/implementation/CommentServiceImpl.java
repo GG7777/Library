@@ -164,6 +164,8 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Long getCommentsCount() {
-        return commentRepo.count();
+        long count = commentRepo.count();
+        log.info("IN getCommentsCount - total comments count = " + count);
+        return count;
     }
 }

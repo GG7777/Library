@@ -75,7 +75,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Long getUsersCount() {
-        return userRepo.count();
+        long count = userRepo.count();
+        log.info("IN getUsersCount - total users count = " + count);
+        return count;
     }
 
     @Override
