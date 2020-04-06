@@ -14,6 +14,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -142,5 +143,20 @@ public class AuthorServiceImpl implements AuthorService {
         long count = authorRepo.count();
         log.info("IN getAuthorsCount - total authors count = " + count);
         return count;
+    }
+
+    @Override
+    public List<Author> searchBy(String firstName, String middleName, String lastName) {
+        if (firstName != null && !firstName.isEmpty() &&
+            middleName != null && !middleName.isEmpty() &&
+            lastName != null && !lastName.isEmpty())
+            return authorRepo.findByFirstNameStartsWithIgnoreCaseAndMiddleNameStartsWithIgnoreCaseAndLastNameStartsWithIgnoreCase(firstName, middleName, lastName);
+        if (firstName != null && !firstName.isEmpty() &&
+            lastName != null && !lastName.isEmpty())
+            return authorRepo.findByFirstNameStartsWithIgnoreCaseAndLastNameStartsWithIgnoreCase(firstName, lastName);
+        if (lastName != null && !lastName.isEmpty())
+            return authorRepo.findByLastNameStartsWithIgnoreCase(lastName);
+
+        return new ArrayList<>();
     }
 }

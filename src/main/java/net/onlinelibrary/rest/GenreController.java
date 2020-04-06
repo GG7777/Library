@@ -13,6 +13,7 @@ import net.onlinelibrary.mapper.GenreMapper;
 import net.onlinelibrary.service.GenreService;
 import org.springframework.web.bind.annotation.*;
 
+import javax.swing.text.View;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -92,5 +93,14 @@ public class GenreController {
         map.put("count", count);
 
         return map;
+    }
+
+    @GetMapping("search")
+    @JsonView(Views.ForEvery.class)
+    public Stream<GenreDto> search(@RequestParam String startsWith) {
+        return genreService
+                .searchBySubStr(startsWith)
+                .stream()
+                .map(genre -> genreMapper.toDto(genre));
     }
 }

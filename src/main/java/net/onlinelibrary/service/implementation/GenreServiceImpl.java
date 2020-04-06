@@ -145,4 +145,9 @@ public class GenreServiceImpl implements GenreService {
         log.info("IN getGenresCount - total genres count = " + count);
         return count;
     }
+
+    @Override
+    public List<Genre> searchBySubStr(String subStr) {
+        return genreRepo.findByGenreStartsWithIgnoreCase(subStr);
+    }
 }

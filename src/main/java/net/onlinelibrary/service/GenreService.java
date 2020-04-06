@@ -7,6 +7,7 @@ import net.onlinelibrary.model.Book;
 import net.onlinelibrary.model.Genre;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 public interface GenreService {
     List<Genre> getByRange(Integer offset, Integer count);
@@ -24,4 +25,6 @@ public interface GenreService {
     void deleteById(Long genreId) throws GenreException;
 
     Long getGenresCount();
+
+    List<Genre> searchBySubStr(String subStr);
 }

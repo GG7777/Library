@@ -3,6 +3,7 @@ package net.onlinelibrary.model;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -23,4 +24,14 @@ public class Author extends BaseEntity {
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Genre> genres;
+
+    public static Author getEmpty() {
+        Author author = new Author();
+        author.setFirstName("");
+        author.setLastName("");
+        author.setMiddleName("");
+        author.setGenres(new ArrayList<>());
+        author.setBooks(new ArrayList<>());
+        return author;
+    }
 }

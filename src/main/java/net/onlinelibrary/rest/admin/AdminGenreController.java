@@ -67,6 +67,12 @@ public class AdminGenreController {
         return genreController.getTotalGenresCount();
     }
 
+    @GetMapping("search")
+    @JsonView(Views.ForEvery.class)
+    public Stream<GenreDto> search(@RequestParam String startsWith) {
+        return genreController.search(startsWith);
+    }
+
     @PostMapping("")
     @JsonView(Views.ForAdmin.class)
     public GenreDto saveGenre(@RequestBody GenreDto dto) {

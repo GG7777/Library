@@ -14,6 +14,7 @@ import net.onlinelibrary.model.Author;
 import net.onlinelibrary.service.AuthorService;
 import org.springframework.web.bind.annotation.*;
 
+import javax.swing.text.View;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -94,5 +95,17 @@ public class AuthorController {
         map.put("count", count);
 
         return map;
+    }
+
+    @GetMapping("search")
+    @JsonView(Views.ForEvery.class)
+    public Stream<AuthorDto> search(
+            @RequestParam(required = false) String firstName,
+            @RequestParam(required = false) String middleName,
+            @RequestParam(required = false) String lastName) {
+        return authorService
+                .searchBy(firstName, middleName, lastName)
+                .stream()
+                .map(author -> authorMapper.toDto(author));
     }
 }

@@ -6,6 +6,7 @@ import net.onlinelibrary.model.Author;
 import net.onlinelibrary.model.Book;
 import net.onlinelibrary.model.Genre;
 
+import java.util.BitSet;
 import java.util.List;
 
 public interface AuthorService {
@@ -24,4 +25,6 @@ public interface AuthorService {
     void deleteById(Long authorId) throws AuthorException;
 
     Long getAuthorsCount();
+
+    List<Author> searchBy(String firstName, String middleName, String lastName);
 }

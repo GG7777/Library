@@ -67,6 +67,15 @@ public class AdminAuthorController {
         return authorController.getTotalAuthorsCount();
     }
 
+    @GetMapping("search")
+    @JsonView(Views.ForEvery.class)
+    public Stream<AuthorDto> search(
+            @RequestParam(required = false) String firstName,
+            @RequestParam(required = false) String middleName,
+            @RequestParam(required = false) String lastName) {
+        return authorController.search(firstName, middleName, lastName);
+    }
+
     @PostMapping("")
     @JsonView(Views.ForAdmin.class)
     public AuthorDto saveNewAuthor(@RequestBody AuthorDto dto) {
