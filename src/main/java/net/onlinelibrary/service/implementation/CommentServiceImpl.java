@@ -8,6 +8,7 @@ import net.onlinelibrary.model.Comment;
 import net.onlinelibrary.model.User;
 import net.onlinelibrary.repository.CommentRepository;
 import net.onlinelibrary.service.CommentService;
+import net.onlinelibrary.substitute.implementation.CommentPropertiesSubstitute;
 import net.onlinelibrary.util.NumberNormalizer;
 import net.onlinelibrary.validator.Validator;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -23,10 +24,15 @@ import java.util.Optional;
 public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepo;
     private final Validator<Comment> commentValidator;
+    private final CommentPropertiesSubstitute commentPropsSubstitute;
 
-    public CommentServiceImpl(CommentRepository commentRepo, Validator<Comment> commentValidator) {
+    public CommentServiceImpl(
+            CommentRepository commentRepo,
+            Validator<Comment> commentValidator,
+            CommentPropertiesSubstitute commentPropsSubstitute) {
         this.commentRepo = commentRepo;
         this.commentValidator = commentValidator;
+        this.commentPropsSubstitute = commentPropsSubstitute;
     }
 
     @Override
@@ -87,6 +93,8 @@ public class CommentServiceImpl implements CommentService {
         comment.setCreatedDate(new Date());
         comment.setLastModifiedDate(new Date());
 
+        comment = commentPropsSubstitute.substitute(comment);
+
         try {
             commentValidator.validate(comment);
         } catch (ValidationException e) {
@@ -126,7 +134,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public Comment updateCommentText(@NotNull Long commentId, @NotNull String text) throws CommentException, ValidationException {
+    public Comment updateCommentText(@NotNull Long commentId, String text) throws CommentException, ValidationException {
         Comment comment;
         try {
             comment = getById(commentId);

@@ -26,7 +26,7 @@ public class BookDto extends BaseDto {
     private String shortDescription;
 
     @JsonView(Views.ForEvery.class)
-    private Integer rating;
+    private Long rating;
 
     @JsonView(Views.ForAdmin.class)
     private List<Long> authors;

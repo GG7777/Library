@@ -7,13 +7,12 @@ import net.onlinelibrary.dto.GenreDto;
 import net.onlinelibrary.dto.view.Views;
 import net.onlinelibrary.exception.GenreException;
 import net.onlinelibrary.exception.withResponseStatus.NotFoundException;
-import net.onlinelibrary.mapper.AuthorMapper;
-import net.onlinelibrary.mapper.BookMapper;
-import net.onlinelibrary.mapper.GenreMapper;
+import net.onlinelibrary.mapper.implementation.AuthorMapper;
+import net.onlinelibrary.mapper.implementation.BookMapper;
+import net.onlinelibrary.mapper.implementation.GenreMapper;
 import net.onlinelibrary.service.GenreService;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.text.View;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -97,9 +96,9 @@ public class GenreController {
 
     @GetMapping("search")
     @JsonView(Views.ForEvery.class)
-    public Stream<GenreDto> search(@RequestParam String startsWith) {
+    public Stream<GenreDto> searchBy(@RequestParam("name") String genreStartsWith) {
         return genreService
-                .searchBySubStr(startsWith)
+                .searchBySubStr(genreStartsWith)
                 .stream()
                 .map(genre -> genreMapper.toDto(genre));
     }

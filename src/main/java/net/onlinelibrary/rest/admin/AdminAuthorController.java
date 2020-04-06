@@ -9,7 +9,7 @@ import net.onlinelibrary.exception.AuthorException;
 import net.onlinelibrary.exception.ValidationException;
 import net.onlinelibrary.exception.withResponseStatus.BadRequestException;
 import net.onlinelibrary.exception.withResponseStatus.NotFoundException;
-import net.onlinelibrary.mapper.AuthorMapper;
+import net.onlinelibrary.mapper.implementation.AuthorMapper;
 import net.onlinelibrary.model.Author;
 import net.onlinelibrary.rest.AuthorController;
 import net.onlinelibrary.service.AuthorService;
@@ -68,7 +68,7 @@ public class AdminAuthorController {
     }
 
     @GetMapping("search")
-    @JsonView(Views.ForEvery.class)
+    @JsonView(Views.ForAdmin.class)
     public Stream<AuthorDto> search(
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String middleName,

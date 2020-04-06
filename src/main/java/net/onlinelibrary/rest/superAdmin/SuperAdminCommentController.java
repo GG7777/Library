@@ -1,4 +1,4 @@
-package net.onlinelibrary.rest.moderator;
+package net.onlinelibrary.rest.superAdmin;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import net.onlinelibrary.dto.BookDto;
@@ -11,7 +11,7 @@ import net.onlinelibrary.exception.withResponseStatus.BadRequestException;
 import net.onlinelibrary.exception.withResponseStatus.NotFoundException;
 import net.onlinelibrary.mapper.implementation.CommentMapper;
 import net.onlinelibrary.model.Comment;
-import net.onlinelibrary.rest.CommentController;
+import net.onlinelibrary.rest.moderator.ModeratorCommentController;
 import net.onlinelibrary.service.CommentService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -20,55 +20,81 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 @RestController
-@RequestMapping("api/moderator/comments")
-@PreAuthorize("hasAuthority('MODERATOR')")
-public class ModeratorCommentController {
+@RequestMapping("api/super-admin/comments")
+@PreAuthorize("hasAuthority('SUPER_ADMIN')")
+public class SuperAdminCommentController {
     private final CommentService commentService;
 
     private final CommentMapper commentMapper;
-    private final CommentController commentController;
+    private final ModeratorCommentController moderatorCommentController;
 
-    public ModeratorCommentController(
+    public SuperAdminCommentController(
             CommentService commentService,
             CommentMapper commentMapper,
-            CommentController commentController) {
+            ModeratorCommentController moderatorCommentController) {
         this.commentService = commentService;
         this.commentMapper = commentMapper;
-        this.commentController = commentController;
+        this.moderatorCommentController = moderatorCommentController;
     }
 
     @GetMapping("")
-    @JsonView(Views.ForModerator.class)
+    @JsonView(Views.ForSuperAdmin.class)
     public Stream<CommentDto> getCommentsInRange(@RequestParam Integer offset, @RequestParam Integer count) {
-        return commentController.getCommentsInRange(offset, count);
+        return moderatorCommentController.getCommentsInRange(offset, count);
     }
 
     @GetMapping("{id}")
-    @JsonView(Views.ForModerator.class)
+    @JsonView(Views.ForSuperAdmin.class)
     public CommentDto getCommentById(@PathVariable("id") Long commentId) {
-        return commentController.getCommentById(commentId);
+        return moderatorCommentController.getCommentById(commentId);
     }
 
     @GetMapping("{id}/book")
-    @JsonView(Views.ForModerator.class)
+    @JsonView(Views.ForSuperAdmin.class)
     public BookDto getBookOfComment(@PathVariable("id") Long commentId) {
-        return commentController.getBookOfComment(commentId);
+        return moderatorCommentController.getBookOfComment(commentId);
     }
 
     @GetMapping("{id}/user")
-    @JsonView(Views.ForModerator.class)
+    @JsonView(Views.ForSuperAdmin.class)
     public UserDto getUserOfComment(@PathVariable("id") Long commentId) {
-        return commentController.getUserOfComment(commentId);
+        return moderatorCommentController.getUserOfComment(commentId);
     }
 
     @GetMapping("count")
-    @JsonView(Views.ForModerator.class)
+    @JsonView(Views.ForSuperAdmin.class)
     public Map<Object, Object> getTotalCommentsCount() {
-        return commentController.getTotalCommentsCount();
+        return moderatorCommentController.getTotalCommentsCount();
+    }
+
+    @PostMapping("")
+    @JsonView(Views.ForSuperAdmin.class)
+    public CommentDto saveComment(@RequestBody CommentDto dto) {
+        Comment comment = commentMapper.toEntity(dto);
+        try {
+            Comment savedComment = commentService.saveNewComment(comment);
+            return commentMapper.toDto(savedComment);
+        } catch (ValidationException e) {
+            throw new BadRequestException("Validation failure - " + e.getMessage());
+        }
+    }
+
+    @PutMapping("{id}")
+    @JsonView(Views.ForSuperAdmin.class)
+    public CommentDto fullUpdateComment(@PathVariable("id") Long commentId, @RequestBody CommentDto dto) {
+        Comment comment = commentMapper.toEntity(dto);
+        try {
+            Comment updatedComment = commentService.updateComment(commentId, comment);
+            return commentMapper.toDto(updatedComment);
+        } catch (CommentException e) {
+            throw new NotFoundException(e.getMessage());
+        } catch (ValidationException e) {
+            throw new BadRequestException("Validation failure - " + e.getMessage());
+        }
     }
 
     @PatchMapping("{id}")
-    @JsonView(Views.ForModerator.class)
+    @JsonView(Views.ForSuperAdmin.class)
     public CommentDto partUpdateComment(@PathVariable("id") Long commentId, @RequestBody CommentDto dto) {
         Comment comment;
         try {
@@ -78,6 +104,10 @@ public class ModeratorCommentController {
         }
         Comment commentByDto = commentMapper.toEntity(dto);
 
+        if (commentByDto.getBook() != null)
+            comment.setBook(commentByDto.getBook());
+        if (commentByDto.getUser() != null)
+            comment.setUser(commentByDto.getUser());
         if (commentByDto.getRating() != null)
             comment.setRating(commentByDto.getRating());
         if (commentByDto.getText() != null)
@@ -94,12 +124,8 @@ public class ModeratorCommentController {
     }
 
     @DeleteMapping("{id}")
-    @JsonView(Views.ForModerator.class)
+    @JsonView(Views.ForSuperAdmin.class)
     public void deleteComment(@PathVariable("id") Long commentId) {
-        try {
-            commentService.deleteById(commentId);
-        } catch (CommentException e) {
-            throw new NotFoundException(e.getMessage());
-        }
+        moderatorCommentController.deleteComment(commentId);
     }
 }

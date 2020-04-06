@@ -1,6 +1,7 @@
-package net.onlinelibrary.mapper;
+package net.onlinelibrary.mapper.implementation;
 
 import net.onlinelibrary.dto.AuthorDto;
+import net.onlinelibrary.mapper.Mapper;
 import net.onlinelibrary.model.Author;
 import net.onlinelibrary.model.Book;
 import net.onlinelibrary.model.Genre;
@@ -13,7 +14,6 @@ import java.util.stream.Collectors;
 
 @Component
 public class AuthorMapper implements Mapper<Author, AuthorDto> {
-
     private final BookRepository bookRepo;
     private final GenreRepository genreRepo;
 

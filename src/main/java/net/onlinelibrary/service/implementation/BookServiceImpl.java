@@ -9,6 +9,7 @@ import net.onlinelibrary.model.Comment;
 import net.onlinelibrary.model.Genre;
 import net.onlinelibrary.repository.BookRepository;
 import net.onlinelibrary.service.BookService;
+import net.onlinelibrary.substitute.implementation.BookPropertiesSubstitute;
 import net.onlinelibrary.util.NumberNormalizer;
 import net.onlinelibrary.validator.implementation.BookValidator;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -24,10 +25,15 @@ import java.util.Optional;
 public class BookServiceImpl implements BookService {
     private final BookRepository bookRepo;
     private final BookValidator bookValidator;
+    private final BookPropertiesSubstitute bookPropsSubstitute;
 
-    public BookServiceImpl(BookRepository bookRepo, BookValidator bookValidator) {
+    public BookServiceImpl(
+            BookRepository bookRepo,
+            BookValidator bookValidator,
+            BookPropertiesSubstitute bookPropsSubstitute) {
         this.bookRepo = bookRepo;
         this.bookValidator = bookValidator;
+        this.bookPropsSubstitute = bookPropsSubstitute;
     }
 
     @Override
@@ -100,6 +106,8 @@ public class BookServiceImpl implements BookService {
         book.setId(null);
         book.setCreatedDate(new Date());
         book.setLastModifiedDate(new Date());
+
+        book = bookPropsSubstitute.substitute(book);
 
         try {
             bookValidator.validate(book);
