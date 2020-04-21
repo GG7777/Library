@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 @RestController
-@RequestMapping("api/user/users")
+@RequestMapping("api/user/comments")
 @PreAuthorize("hasAuthority('USER')")
 public class UserCommentController {
     private final CommentService commentService;

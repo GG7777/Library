@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 @RestController
-@RequestMapping("api/user/comments")
+@RequestMapping("api/user/users")
 @PreAuthorize("hasAuthority('USER')")
 public class UserUserController {
     private final UserService userService;
